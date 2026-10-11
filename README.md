@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Event Scout
 
-## Getting Started
+**AI-powered event intelligence for business development.**
+*Find the right rooms. Never miss the opportunity.*
 
-First, run the development server:
+Final examination project — MESA School of Business, Cohort C4, *AI and its Applications*. Problem statement: **Industry Event Scout**.
+
+Vikram, an independent management consultant, wins 40% of new business at in-person events but loses ~45 minutes every Monday searching fragmented listings — and still misses deadlines. Event Scout pulls live events from several sources, ranks them for him with Gemini Flash, flags registration deadlines under 7 days, and emails a scannable digest every Monday at 08:00 IST.
+
+- **Architecture and requirement traceability:** [docs/COMPONENTS_MAP.md](docs/COMPONENTS_MAP.md)
+- **Live app:** _not deployed yet_
+- **Repository:** _not pushed yet_
+
+## What it does
+
+| | |
+|---|---|
+| Live discovery | Luma, Eventbrite and Meetup for your target cities, next 30 days; validated, normalised, de-duplicated, every source link kept |
+| AI (Gemini Flash only) | Classification, 2-sentence summaries, explicit-deadline extraction with verbatim evidence, and relevance scoring blended with deterministic rules |
+| Deadlines | Stated deadlines only (never inferred from the event date); `< 7 days` flagged urgent; "Deadline unknown" otherwise |
+| Preferences | Categories, cities, topics, formats, minimum score, digest recipient, Calendly link — stored in the database, editable in the app |
+| Dashboard | Weekly figures, top matches, urgent deadlines, actions, pipeline, source freshness |
+| Pipeline & checklist | Saved → To register → Registered → Attended → Follow-up; weekly tasks derived from real events |
+| Monday digest | Vercel Cron → HTML + text email via Resend, once per week (idempotent), with a 10:00 retry |
+| Status | Source health, job history, configuration check |
+
+## Stack
+
+Next.js 16 (App Router, TypeScript, Cache Components) · Tailwind CSS 4 · Neon Postgres + Drizzle ORM · Gemini Flash via `@google/genai` · Resend · Vercel (hosting + cron) · Zod · Vitest.
+
+Why each dependency: `@neondatabase/serverless` + `drizzle-orm` (serverless Postgres over HTTP, typed queries, versioned migrations), `@google/genai` (official Gemini SDK), `resend` (email with idempotency keys), `zod` (validation of all external data, AI output and API input), `server-only` (keeps keys out of client bundles), `vitest`/`drizzle-kit`/`dotenv`/`tsx` (dev only).
+
+## Run it locally
+
+Requirements: Node 20+ (tested on Node 24), npm.
+
+```bash
+npm install
+```
+
+1. Fill in `.env.local` (created for you; template in [.env.example](.env.example)): `DATABASE_URL` (Neon), `GEMINI_API_KEY`, `RESEND_API_KEY`, `DIGEST_RECIPIENT_EMAIL`, `APP_PASSWORD`. `CRON_SECRET` and `SESSION_SECRET` are pre-generated.
+2. Create the tables:
+
+```bash
+npm run db:migrate
+```
+
+3. Start the app and open http://localhost:3000:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Sign in, then **Run discovery now** on the dashboard. The first run fetches live events and scores them (1–3 minutes).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test
+```
 
-## Learn More
+```bash
+npm run test:live
+```
 
-To learn more about Next.js, take a look at the following resources:
+`npm test` covers deadline boundaries (exactly 7 days, 7 days − 1 s, tomorrow, passed, unknown, conflicting sources), IST time handling, normalisation, de-duplication, ranking rules, preference effects, and the AI evidence guard. `npm run test:live` hits the real sources.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy to Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Push to GitHub and import the repo in Vercel.
+2. Add every variable from `.env.example` in Project → Settings → Environment Variables (set `APP_URL` to the production URL).
+3. Deploy. `vercel.json` registers the crons: discovery daily 06:00 IST, digest Mondays 08:00 IST (+10:00 retry). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
+4. Run `npm run db:migrate` once against the production `DATABASE_URL` (or use the same Neon database).
 
-## Deploy on Vercel
+## Project layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/(app)/        dashboard, events, events/[id], pipeline, checklist, digest, settings, status
+  app/api/          cron/discover, cron/digest, jobs, preferences, events/[id]/status, checklist/[id], digest/preview, auth/login
+  app/login/        sign-in
+  proxy.ts          password protection for every page and API route
+  components/       dashboard UI, event cards, checklist, settings form, shared UI
+  lib/discovery/    connectors (luma, eventbrite, meetup), normalise, deduplicate, pipeline
+  lib/ai/           gemini client, classification, deadlines + evidence guard, ranking, batch processing
+  lib/ranking/      deterministic scoring rules
+  lib/digest/       selection + send with idempotency
+  lib/email/        Resend wrapper, HTML/text template
+  lib/services/     users/preferences, events queries, checklist, jobs, workflows
+  lib/deadlines.ts  urgency policy;  lib/time.ts  IST time policy
+db/migrations/      SQL migrations (Drizzle)
+tests/              unit tests; tests/live for live-source acceptance tests
+docs/               Components Map
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Known limitations
+
+See [Components Map §8](docs/COMPONENTS_MAP.md#8-known-limitations). In short: three sources (not universal coverage); most listings publish no registration deadline; Luma's endpoint is undocumented and listing-page data can change; Google Calendar is planned (Phase 7).
