@@ -10,7 +10,7 @@ Problem statement: **Industry Event Scout**
 
 > **Status legend** — ✅ Implemented and verified (test or live production run) · 🟨 Implemented, partially verified · ⬜ Planned
 >
-> Last updated: 12 Oct 2026 — deployed to Vercel with Neon, Gemini Flash and Resend. Nothing is ✅ unless exercised by a test or a live run — see §7.
+> Last updated: 12 Oct 2026 (evening) — redesign, extra sources, real deadlines and calendar export deployed. Nothing is ✅ unless exercised by a test or a live run — see §7.
 
 ---
 
@@ -19,21 +19,21 @@ Problem statement: **Industry Event Scout**
 | # | Requirement | Type | Delivered by | Status |
 |---|---|---|---|---|
 | R1 | Live external event data (no fabricated records) | **Mandatory** | C1, C2 | ✅ 110 live events stored in production (12 Oct) |
-| R2 | Multi-source discovery | **Mandatory** | C1 — Luma, Eventbrite, Meetup | ✅ all three succeeded in production (30 / 55 / 36) |
+| R2 | Multi-source discovery | **Mandatory** | C1 — Luma, Eventbrite, Meetup, AllEvents, NASSCOM, iSPIRT, Gemini web search, user-added sources, paste-a-link | ✅ 188 events in production; Gemini-based sources run when daily quota allows |
 | R3 | Configurable categories and cities, no code change | **Mandatory** | C5 (DB-stored preferences + Settings page) | ✅ saved via the live API and persisted |
 | R4 | AI relevance ranking with **Gemini Flash** | **Mandatory** | C4 | 🟨 live Gemini Flash classification verified (25 events); full ranking limited by free-tier quota (20 req/day/model) — see §8 |
 | R5 | Events covering the next 30 days | **Mandatory** | `discoveryWindow()` | ✅ |
-| R6 | Registration deadline detection | **Mandatory** | C1 (source-stated), C4 (text extraction w/ evidence) | ✅ logic tested · live sources stated no deadlines on 12 Oct |
-| R7 | Clear warning when deadline < 7 days | **Mandatory** | C6, C7, C10 | ✅ boundary tests |
+| R6 | Registration deadline detection | **Mandatory** | Eventbrite ticket-sales end, Luma ticket end, text extraction with evidence | ✅ 19 of 20 Eventbrite pages checked gave a real deadline |
+| R7 | Clear warning when deadline < 7 days | **Mandatory** | C6, Today, Explore, briefing | ✅ boundary tests · 9 live urgent deadlines shown |
 | R8 | Clean, scannable weekly digest | **Mandatory** | C10 | ✅ delivered to inbox (12 Oct) |
 | R9 | Delivered every Monday morning (automated) | **Mandatory** | Vercel Cron → C10 → C11 | ✅ crons registered; scheduled endpoint sent once and blocked the repeat |
 | R10 | Deployed on Vercel, public URL | **Mandatory** | §6 | ✅ https://event-scout-five.vercel.app |
 | R11 | GitHub repository + Components Map | **Mandatory** | this file, README | ✅ |
-| E1 | Dashboard / command centre | Enhancement | C7 | ✅ live with real data |
+| E1 | Today view (daily companion) | Enhancement | C7 | ✅ decision cards verified live (Save → My events) |
 | E2 | Duplicate detection across sources | Enhancement | C3 | ✅ unit + live |
 | E3 | Event pipeline | Enhancement | C8 | 🟨 implemented; manual UI check pending |
 | E4 | Weekly action checklist | Enhancement | C9 | ✅ tasks generated from live events |
-| E5 | Google Calendar | Enhancement | C12 | ⬜ Phase 7 |
+| E5 | Calendar | Enhancement | C12 | ✅ Google Calendar link + .ics with deadline reminder (no OAuth needed) |
 | E6 | Calendly booking link | Enhancement | C13 | ✅ link saved in live preferences |
 | E7 | Observability / system status | Enhancement | C14 | ✅ source runs, job runs and Gemini errors visible on /status |
 
@@ -44,7 +44,7 @@ Problem statement: **Industry Event Scout**
 | R4 | AI relevance ranking with **Gemini Flash** | **Mandatory** | C4 | 🟨 rules + guards tested · live Gemini call needs `GEMINI_API_KEY` |
 | R5 | Events covering the next 30 days | **Mandatory** | C1 window filter, `discoveryWindow()` | ✅ |
 | R6 | Registration deadline detection | **Mandatory** | C1 (source-stated), C4 (text extraction w/ evidence) | ✅ logic tested · 🟨 AI extraction needs key |
-| R7 | Clear warning when deadline < 7 days | **Mandatory** | C6, C7, C10 | ✅ boundary tests |
+| R7 | Clear warning when deadline < 7 days | **Mandatory** | C6, Today, Explore, briefing | ✅ boundary tests · 9 live urgent deadlines shown |
 | R8 | Clean, scannable weekly digest | **Mandatory** | C10 | 🟨 template built · needs DB + data |
 | R9 | Delivered every Monday morning (automated) | **Mandatory** | Vercel Cron → C10 → C11 | 🟨 needs deploy + `RESEND_API_KEY` |
 | R10 | Deployed on Vercel, public URL | **Mandatory** | §6 | ⬜ |
@@ -53,7 +53,7 @@ Problem statement: **Industry Event Scout**
 | E2 | Duplicate detection across sources | Enhancement | C3 | ✅ unit + live |
 | E3 | Event pipeline | Enhancement | C8 | 🟨 |
 | E4 | Weekly action checklist | Enhancement | C9 | 🟨 |
-| E5 | Google Calendar | Enhancement | C12 | ⬜ Phase 7 |
+| E5 | Calendar | Enhancement | C12 | ✅ Google Calendar link + .ics with deadline reminder (no OAuth needed) |
 | E6 | Calendly booking link | Enhancement | C13 | 🟨 configurable link implemented |
 | E7 | Observability / system status | Enhancement | C14 | 🟨 |
 
@@ -107,14 +107,19 @@ Flow: connectors fetch → records validated and normalised (unknowns stay null)
 ## 3. Components
 
 ### C1 · Event Discovery Engine — **Mandatory**
-| Connector | Method | Deadline data | Notes |
-|---|---|---|---|
-| Luma | Public Discover listing JSON by city + public event detail | `ticket_types[].valid_end_at` when every visible ticket type states one | Undocumented endpoint: all fields optional; shape changes surface as run errors |
-| Eventbrite | schema.org Event JSON-LD on public city/category pages | Not published in listings → unknown | Public search API was retired in 2020. Paced at 1 request / 2 s, one 429 retry. Out-of-country promoted listings filtered |
-| Meetup | schema.org Event JSON-LD on public "find" pages (Career & Business) | Not published → unknown | Cancelled events skipped |
+| Source | Method | Deadline data |
+|---|---|---|
+| Luma | Public Discover listing JSON by city + public event detail | Ticket `valid_end_at` when every visible ticket type states one |
+| Eventbrite | schema.org JSON-LD on public listing pages; each event page read for detail (20/run, paced) | **`offers.availabilityEnds` (ticket sales end)** + exact start time |
+| Meetup | schema.org JSON-LD on public "find" pages (Career & Business) | Not published → unknown |
+| AllEvents (Bengaluru, Mumbai, Delhi business) | schema.org JSON-LD (default custom source) | Not published → unknown |
+| NASSCOM events, iSPIRT ProductNation feed | Page / RSS text → Gemini Flash extraction (default custom sources) | Only if stated in text, with evidence |
+| User-added sources | Any page, RSS/Atom or iCal URL (Settings → Sources); iCal and schema.org parsed directly | iCal: none inferred · text: with evidence |
+| Gemini web search | Gemini Flash + Google Search; each result fetched and kept only if its page shows the title and date | With evidence from the page |
+| Add from a link | One URL and/or pasted text (for LinkedIn and other sign-in sites) → saved straight to the pipeline | With evidence |
 
-Each run writes a `source_runs` row: source, start/finish, status (success / partial / failed), retrieved, accepted, errors. One failing source never blocks the others. iSPIRT was evaluated and excluded (its feed is blog posts, not events).
-**Code:** `src/lib/discovery/connectors/*`, `pipeline.ts`, `/api/cron/discover`
+Every run writes `source_runs` (status, retrieved, accepted, errors). A source waiting for Gemini quota is reported as "waiting", not failed. Unchanged pages are not re-sent to Gemini (content hash). YourStory was evaluated and excluded (robots.txt disallows crawling).
+**Code:** `src/lib/discovery/connectors/*`, `details.ts`, `capture.ts`, `pipeline.ts`
 
 ### C2 · Normalisation — **Mandatory**
 Zod schema `CandidateEventSchema` (`src/types/event.ts`): http(s) URLs only, title 3–300 chars, end ≥ start, text cleaned of HTML/entities. Invalid records are rejected with a logged reason — never patched with guesses. Date-only sources are stored as all-day (`all_day = true`) at local midnight rather than inventing a time.
@@ -138,8 +143,8 @@ Categories, cities, topics, formats, minimum fit score, digest recipient, digest
 ### C6 · Deadline Intelligence — **Mandatory**
 Stored separately from event dates, never inferred from them. Time-zone policy: stored UTC, displayed and bucketed in `Asia/Kolkata`. `urgent` ⇔ 0 < time left < exactly 7 × 24 h; `closed` ⇔ passed; missing ⇒ "Deadline unknown". Conflicting sources → earliest kept, flagged. Passed deadlines never shown as open unless the source currently reports registration open.
 
-### C7 · Dashboard
-Weekly figures, top recommended, deadlines < 7 days, actions, upcoming registered events, pipeline counts, source freshness, warnings for default preferences / failed sources / unscored events. Streaming loading skeletons, empty and error states; buttons call real endpoints and report real outcomes.
+### C7 · Today (daily companion)
+Plain-English brief, two-week day strip (tap to filter), one-at-a-time decision cards with cover photos, fit score and countdown ring: **Not for me** (hidden from Today and the briefing), **Save**, **Register** (opens the organiser's page; marked Registered only when Vikram confirms). Side panels: Closing soon, You're going, This week. Explore is a filterable photo-card grid; event pages have a full hero. Colour families by category. Streaming skeletons, empty and error states.
 
 ### C8 · Event Pipeline
 `discovered → saved → to_register → registered → attended → follow_up_complete`, set manually (skips allowed). Registration status is never changed automatically.
@@ -153,8 +158,8 @@ Next 30 days; urgent deadlines first, then top 12 by fit; dates, locations, reas
 ### C11 · Email Delivery — **Mandatory**
 Resend. `digest_runs.idempotency_key` is unique: `scheduled:<user>:<week>` (cron) or `manual:<user>:<minute>`. A sent digest is never resent; a failed one may be retried (atomic claim); the same key is passed to Resend's `idempotencyKey` so a timed-out request cannot double-send. Every attempt logged in `notification_logs`. Two Monday crons (06:30, 08:00 IST) give an automatic retry.
 
-### C12 · Google Calendar — Enhancement ⬜ (Phase 7)
-Planned: OAuth (`calendar.events` scope), add selected events + deadline reminder, `calendar_links` table, duplicate prevention, revoked-access handling.
+### C12 · Calendar — Enhancement ✅
+No-OAuth approach (free, nothing to authorise): a Google Calendar pre-filled link and an RFC 5545 `.ics` download per event, with a separate "Registration closes" event and 24-hour reminder when a deadline is known. Stable UIDs prevent duplicates on re-import. Adding to a calendar never changes pipeline status. Full Google Calendar OAuth sync remains a possible extension.
 
 ### C13 · Calendly — Enhancement 🟨
 Configurable `calendly.com` link (validated), surfaced in follow-up tasks, dashboard and digest. No attendee identification is claimed.
@@ -178,7 +183,8 @@ Migration: `db/migrations/0000_init.sql` (generated from `src/lib/db/schema.ts`)
 | `events` | Canonical event | unique `dedupe_key`; idx start, deadline, url; end ≥ start |
 | `event_sources` | Every source reference | unique (source, source_event_id); FK cascade |
 | `event_scores` | Per-user rules/AI/final score + reason | PK (event, user); final 0–100 |
-| `saved_events` | Pipeline status | PK (user, event) |
+| `saved_events` | Pipeline status (incl. `dismissed` = Not for me) | PK (user, event) |
+| `custom_sources` | User-added sites/feeds + content hash | unique `url` |
 | `checklist_tasks` | C9 | unique (user, week, kind, event) |
 | `digest_runs` | Digest sends | unique `idempotency_key` |
 | `notification_logs` | Each email attempt | FK digest_run |
@@ -212,7 +218,7 @@ Change from the original plan: **Neon replaces Supabase**, provisioned through t
 
 ## 7. Testing evidence
 
-`npm test` (unit, 43 tests) and `npm run test:live` (live network, 5 tests). Production checks run against https://event-scout-five.vercel.app on 12 Oct 2026.
+`npm test` (unit, 62 tests) and `npm run test:live` (live network, 7 tests). Production checks run against https://event-scout-five.vercel.app on 12 Oct 2026.
 
 | Area | Test | Result |
 |---|---|---|
@@ -235,6 +241,11 @@ Change from the original plan: **Neon replaces Supabase**, provisioned through t
 | Cron | Scheduled digest endpoint sent this week's digest once; second call "Already sent for this week" | ✅ |
 | Cron | Three schedules registered in Vercel (discovery daily 05:00, digest Mon 06:30 + 08:00 IST) | ✅ |
 | Build | `next build` + `tsc` + ESLint clean | ✅ |
+| Deadlines | Eventbrite event pages state ticket-sales end (live: 4/4; production: 19/20) | ✅ |
+| Sources | AllEvents structured data (live: 15/15 valid); iCal, RSS and page parsing unit-tested | ✅ |
+| AI guard | Extracted events need verbatim title + date in the text; web results need title + date on their own page | ✅ |
+| Calendar | .ics structure, IST all-day dates, escaping/folding, deadline reminder, Google link | ✅ |
+| Today | Decision card Save → appears under Saved in My events (production) | ✅ |
 | Deployment | Public URL loads; production integrations work | ✅ |
 
 ## 8. Known limitations

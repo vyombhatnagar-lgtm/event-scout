@@ -15,18 +15,20 @@ Vikram, an independent management consultant, wins 40% of new business at in-per
 
 | | |
 |---|---|
-| Live discovery | Luma, Eventbrite and Meetup for your target cities, next 30 days; validated, normalised, de-duplicated, every source link kept |
-| AI (Gemini Flash only) | Classification, 2-sentence summaries, explicit-deadline extraction with verbatim evidence, and relevance scoring blended with deterministic rules |
-| Deadlines | Stated deadlines only (never inferred from the event date); `< 7 days` flagged urgent; "Deadline unknown" otherwise |
-| Preferences | Categories, cities, topics, formats, minimum score, digest recipient, Calendly link — stored in the database, editable in the app |
-| Dashboard | Weekly figures, top matches, urgent deadlines, actions, pipeline, source freshness |
-| Pipeline & checklist | Saved → To register → Registered → Attended → Follow-up; weekly tasks derived from real events |
-| Monday digest | Vercel Cron → HTML + text email via Resend, once per week (idempotent), with an 08:00 retry |
+| **Today** | A calm morning view: plain-English brief, two-week day strip, and one-at-a-time decision cards (Not for me · Save · Register) with real cover photos, fit score and a countdown ring. Keyboard: ← → ↓ |
+| Live discovery | Luma, Eventbrite, Meetup, AllEvents, NASSCOM, iSPIRT ProductNation and Gemini web search, for your cities, next 30 days; validated, de-duplicated, every source link kept |
+| Your own sources | Add any conference site, newsletter RSS or iCal feed in Settings; or **add an event from a link / pasted LinkedIn post** |
+| AI (Gemini Flash only) | Classification, summaries, explicit-deadline extraction, event extraction from pages/posts and relevance scoring — every AI claim checked against the source text |
+| Deadlines | Real ticket-sales-end dates from Eventbrite and Luma, or stated in the text — never inferred from the event date; under 7 days flagged everywhere |
+| Calendar | One click to Google Calendar, or an .ics (Outlook/Apple) with a "registration closes" reminder — no sign-in |
+| My events | Colour-coded lanes: Going · To register · Saved · After the event; weekly action checklist |
+| Monday briefing | Executive-memo email via Resend every Monday 06:30 IST (08:00 retry), sent once per week (idempotent) |
+| Preferences | Categories, cities, topics, formats, minimum fit, recipient, Calendly link — stored in the database |
 | Status | Source health, job history, configuration check |
 
 ## Stack
 
-Next.js 16 (App Router, TypeScript, Cache Components) · Tailwind CSS 4 · Neon Postgres + Drizzle ORM · Gemini Flash via `@google/genai` (3.8 Flash, falling back to 3.6 / 3.5 Flash when a model is out of quota) · Resend · Calendly booking link · Vercel (hosting + cron) · Zod · Vitest.
+Next.js 16 (App Router, TypeScript, Cache Components) · Tailwind CSS 4 (Instrument Sans / Instrument Serif) · Neon Postgres + Drizzle ORM · Gemini Flash via `@google/genai` (3.8 Flash, falling back to 3.6 / 3.5 Flash when a model is out of quota) · Resend · Calendly booking link · Vercel (hosting + cron) · Zod · Vitest.
 
 Why each dependency: `@neondatabase/serverless` + `drizzle-orm` (serverless Postgres over HTTP, typed queries, versioned migrations), `@google/genai` (official Gemini SDK), `resend` (email with idempotency keys), `zod` (validation of all external data, AI output and API input), `server-only` (keeps keys out of client bundles), `vitest`/`drizzle-kit`/`dotenv`/`tsx` (dev only).
 
