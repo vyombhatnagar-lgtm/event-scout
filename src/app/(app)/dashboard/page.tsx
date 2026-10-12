@@ -140,8 +140,6 @@ async function Today() {
           </Notice>
         )}
 
-        <WeekGlance now={now} events={[...events, ...pipeline.filter((p) => !events.some((e) => e.id === p.id))]} minScore={prefs.minScore} />
-
         <div className="flex flex-wrap items-start gap-6">
           <section aria-label="Decide" className="min-w-0 flex-[999_1_540px]">
             <TodayDeck items={deck.map(toDeckItem)} days={days} />
@@ -241,6 +239,7 @@ async function Today() {
           </aside>
         </div>
 
+        <WeekGlance now={now} events={[...events, ...pipeline.filter((p) => !events.some((e) => e.id === p.id))]} minScore={prefs.minScore} />
       </>
     );
   });
