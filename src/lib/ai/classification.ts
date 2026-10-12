@@ -1,6 +1,6 @@
 import "server-only";
 import { z } from "zod";
-import { ThinkingLevel, generateStructured } from "./gemini";
+import { generateStructured } from "./gemini";
 
 export const EVENT_CATEGORIES = [
   "Conference",
@@ -71,7 +71,7 @@ export async function classifyEvents(batch: ClassifyInput[]): Promise<ClassifyOu
   const prompt = JSON.stringify(
     batch.map((e) => ({ ...e, description: e.description?.slice(0, 1500) ?? null })),
   );
-  const out = await generateStructured({ system: SYSTEM, prompt: `Events:\n${prompt}`, jsonSchema: schema, validator: Output, thinking: ThinkingLevel.MINIMAL });
+  const out = await generateStructured({ system: SYSTEM, prompt: `Events:\n${prompt}`, jsonSchema: schema, validator: Output });
   const ids = new Set(batch.map((b) => b.id));
   return out.events.filter((e) => ids.has(e.id));
 }

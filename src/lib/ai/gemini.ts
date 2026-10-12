@@ -74,7 +74,7 @@ export async function generateStructured<T>(opts: {
   /** MINIMAL for simple labelling tasks (faster), LOW where judgement matters. */
   thinking?: ThinkingLevel;
 }): Promise<T> {
-  const attempts = opts.attempts ?? 2;
+  const attempts = opts.attempts ?? 3;
   let lastErr: AiError | null = null;
   for (const model of geminiModels()) {
     if (exhausted.has(model)) continue;
@@ -112,9 +112,11 @@ export async function generateStructured<T>(opts: {
           exhausted.add(model);
           break; // try the next Flash model
         }
-        if (lastErr.overloaded) break; // 503: this model is busy right now — try the next Flash model
+        // 503: this model is busy — move to another Flash model if one still has quota, else wait and retry.
+        const others = geminiModels().filter((m) => m !== model && !exhausted.has(m));
+        if (lastErr.overloaded && others.length && geminiModels().indexOf(others[0]) > geminiModels().indexOf(model)) break;
 
-        if (i < attempts - 1) await sleep(3_000 * 2 ** i);
+        if (i < attempts - 1) await sleep(5_000 * 2 ** i);
       }
     }
   }
