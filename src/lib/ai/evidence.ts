@@ -4,6 +4,12 @@ export const DEADLINE_HINT =
 
 const squash = (s: string) => s.toLowerCase().replace(/\s+/g, " ").replace(/[“”]/g, '"').replace(/[‘’]/g, "'").trim();
 
+/** True when `quote` (normalised for whitespace and quote marks) appears in `text`. */
+export function verifyQuote(quote: string | null | undefined, text: string): boolean {
+  if (!quote || quote.trim().length < 3) return false;
+  return squash(text).includes(squash(quote));
+}
+
 /**
  * Guard against hallucinated deadlines. A model-extracted deadline is accepted only if:
  *  - it parses as a date,
@@ -19,7 +25,7 @@ export function verifyDeadlineEvidence(
   const d = new Date(r.deadline);
   if (Number.isNaN(d.getTime())) return { deadline: null, evidence: null, rejected: "unparseable date" };
   if (!r.evidence || r.evidence.trim().length < 8) return { deadline: null, evidence: null, rejected: "no evidence quote" };
-  if (!squash(sourceText).includes(squash(r.evidence))) return { deadline: null, evidence: null, rejected: "evidence not found in source text" };
+  if (!verifyQuote(r.evidence, sourceText)) return { deadline: null, evidence: null, rejected: "evidence not found in source text" };
   if (d.getTime() > eventStart.getTime()) return { deadline: null, evidence: null, rejected: "deadline after event start" };
   return { deadline: d, evidence: r.evidence.trim() };
 }

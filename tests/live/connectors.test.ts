@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { resolveCity } from "@/lib/discovery/cities";
 import { eventbrite, parseEventbriteDetail } from "@/lib/discovery/connectors/eventbrite";
 import { luma } from "@/lib/discovery/connectors/luma";
+import { extractLdEvents } from "@/lib/discovery/connectors/jsonld";
+import { ldToCandidate } from "@/lib/discovery/connectors/content";
 import { meetup } from "@/lib/discovery/connectors/meetup";
 import { type Connector, fetchText } from "@/lib/discovery/connectors/types";
 import { deduplicate } from "@/lib/discovery/deduplicate";
@@ -73,5 +75,13 @@ describe("live sources (real network)", () => {
       await new Promise((r) => setTimeout(r, 1500));
     }
     expect(found.length).toBeGreaterThan(0);
+  });
+
+  it("AllEvents custom source yields real events from structured data (no AI needed)", async () => {
+    const url = "https://allevents.in/bangalore/business";
+    const list = extractLdEvents(await fetchText(url)).map((e) => ldToCandidate(e, "AllEvents", url)).filter(Boolean);
+    const valid = list.map((c) => normalise(c!)).filter((r) => r.ok);
+    console.log(`\n[AllEvents] ${list.length} structured events, ${valid.length} valid`);
+    expect(valid.length).toBeGreaterThan(0);
   });
 });

@@ -41,6 +41,13 @@ export function canonicalCity(raw: string | null | undefined): string | null {
   return hit ? hit.name : raw.trim();
 }
 
+/** Canonical name if `raw` is one of the known cities (or an alias), else null. */
+export function knownCity(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const key = raw.trim().toLowerCase();
+  return KNOWN.find((c) => c.aliases.includes(key) || c.name.toLowerCase() === key)?.name ?? null;
+}
+
 export function cityMatches(eventCity: string | null, targets: string[]): boolean {
   if (!eventCity) return false;
   const c = canonicalCity(eventCity)?.toLowerCase();

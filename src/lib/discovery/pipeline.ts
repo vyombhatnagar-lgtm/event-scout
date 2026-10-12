@@ -3,8 +3,9 @@ import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db/client";
 import { resolveDeadline } from "@/lib/deadlines";
 import { discoveryWindow } from "@/lib/time";
-import type { CandidateEvent } from "@/types/event";
+import type { CandidateEvent, CandidateEventInput } from "@/types/event";
 import { resolveCity } from "./cities";
+import { customSources } from "./connectors/custom";
 import { eventbrite } from "./connectors/eventbrite";
 import { luma } from "./connectors/luma";
 import { meetup } from "./connectors/meetup";
@@ -12,7 +13,7 @@ import { type Connector, errMsg, mapLimit } from "./connectors/types";
 import { deduplicate, type MergedCandidate } from "./deduplicate";
 import { normalise } from "./normalise";
 
-export const CONNECTORS: Connector[] = [luma, eventbrite, meetup];
+export const CONNECTORS: Connector[] = [luma, eventbrite, meetup, customSources];
 
 export interface SourceReport {
   source: string;
@@ -82,7 +83,7 @@ export async function runDiscovery(cityNames: string[], now = new Date()): Promi
 }
 
 async function persist(groups: MergedCandidate[]) {
-  if (groups.length === 0) return { inserted: 0, updated: 0 };
+  if (groups.length === 0) return { inserted: 0, updated: 0, ids: [] as string[] };
   const d = db();
 
   // Prefetch matches for the whole batch: by source id, by canonical URL, by dedupe key.
@@ -105,6 +106,7 @@ async function persist(groups: MergedCandidate[]) {
 
   let inserted = 0;
   let updated = 0;
+  const ids: string[] = [];
   const now = new Date();
 
   await mapLimit(groups, 6, async (g) => {
@@ -185,9 +187,10 @@ async function persist(groups: MergedCandidate[]) {
     }
 
     await refreshEventDeadline(eventId);
+    ids.push(eventId);
   });
 
-  return { inserted, updated };
+  return { inserted, updated, ids };
 }
 
 /** Source-stated deadlines win over AI-extracted ones; conflicts keep the earliest and are flagged. */
@@ -212,4 +215,17 @@ export async function refreshEventDeadline(eventId: string) {
         .where(and(eq(schema.events.id, eventId), eq(schema.events.deadlineOrigin, "source")));
     }
   }
+}
+
+/** Validate, de-duplicate and store events from a single ad-hoc source (e.g. an event pasted by the user). */
+export async function persistCandidates(raw: CandidateEventInput[]) {
+  const accepted: CandidateEvent[] = [];
+  const rejected: string[] = [];
+  for (const r of raw) {
+    const n = normalise(r);
+    if (n.ok) accepted.push(n.event);
+    else rejected.push(n.reason);
+  }
+  const { ids } = await persist(deduplicate(accepted));
+  return { ids, rejected };
 }

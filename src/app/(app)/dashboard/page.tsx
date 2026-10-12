@@ -63,6 +63,9 @@ async function Dashboard() {
           }
           actions={
             <>
+              <Link href="/events/new" className="inline-flex min-h-11 items-center rounded-md border border-[#d5d8d1] bg-surface px-4 text-sm font-medium text-ink no-underline hover:border-ink-2 hover:text-ink">
+                Add event from link
+              </Link>
               <JobButton job="discovery" label="Run discovery now" />
               <Link href="/digest" className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white no-underline hover:bg-accent-ink hover:text-white">
                 Preview Monday digest

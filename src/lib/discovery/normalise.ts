@@ -14,6 +14,7 @@ export function cleanText(s: string | null | undefined): string | null {
       return ENTITIES[e.toLowerCase()] ?? m;
     })
     .replace(/[ \t]+/g, " ")
+    .replace(/ *\n */g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
   return out.length ? out : null;

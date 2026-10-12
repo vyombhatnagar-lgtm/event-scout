@@ -134,6 +134,8 @@ export const customSources = pgTable(
     lastStatus: text("last_status"),
     lastError: text("last_error"),
     eventsFound: integer("events_found").notNull().default(0),
+    /** Hash of the text last sent to Gemini — unchanged pages are not re-extracted. */
+    contentHash: text("content_hash"),
     createdAt: ts("created_at").notNull().defaultNow(),
   },
   (t) => [uniqueIndex("custom_sources_url_uq").on(t.url)],
