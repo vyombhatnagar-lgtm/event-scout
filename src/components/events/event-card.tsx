@@ -64,7 +64,7 @@ export function EventCard({ e }: { e: EventView }) {
     <article className="flex flex-col overflow-hidden rounded-[22px] bg-surface shadow-[var(--shadow-soft)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]">
       <EventCover image={e.imageUrl} hue={hue} seed={e.id} height={132}>
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-          <Chip strong>{categoryLabel(e.categories)}</Chip>
+          <Chip strong>{e.categories.length ? categoryLabel(e.categories) : (e.city ?? placeLabel(e))}</Chip>
           {e.score != null && e.aiScore == null && <Chip>Rules only</Chip>}
         </div>
         <div className="absolute top-3 right-3">

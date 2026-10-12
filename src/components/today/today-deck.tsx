@@ -131,7 +131,7 @@ export function TodayDeck({ items, days }: { items: DeckItem[]; days: DayCell[] 
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="group" aria-label="Pick a day">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Pick a day">
         {days.map((d) => {
           const on = day === d.key;
           return (
@@ -280,7 +280,7 @@ export function TodayDeck({ items, days }: { items: DeckItem[]; days: DayCell[] 
       )}
 
       {pool.length > 1 && !confirming && (
-        <div className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1" aria-label="Up next">
+        <div className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Up next">
           {pool.slice(1, 5).map((u) => (
             <Link key={u.id} href={`/events/${u.id}`} className="flex w-[220px] shrink-0 flex-col gap-1.5 rounded-[18px] bg-surface px-4 py-3.5 text-ink no-underline shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition hover:-translate-y-0.5 hover:text-ink hover:shadow-[var(--shadow-soft)]">
               <span className="h-1.5 w-7 rounded-full" style={{ background: u.hue.shape }} />

@@ -50,7 +50,7 @@ function toDeckItem(e: EventView): DeckItem {
     why: e.reason ?? e.summary,
     fit: e.score,
     rulesOnly: e.aiScore == null,
-    category: categoryLabel(e.categories),
+    category: e.categories.length ? categoryLabel(e.categories) : (e.city ?? placeLabel(e)),
     hue: { tint: hue.tint, shape: hue.shape, ink: hue.ink },
     image: e.imageUrl,
     day: localDate(e.startAt),
@@ -79,16 +79,11 @@ async function Today() {
 
     const live = events.filter((e) => e.status !== "dismissed");
     const relevant = live.filter((e) => e.score != null && e.score >= prefs.minScore && e.deadlineState.kind !== "closed");
-    // Deck: undecided relevant events — urgent deadlines first (soonest first), then best fit.
+    // Deck: undecided relevant events, best fit first — with a boost when registration closes within a week.
+    const priority = (e: EventView) => (e.score ?? 0) + (e.deadlineState.kind === "urgent" ? 12 : 0);
     const deck = relevant
       .filter((e) => e.status === "discovered")
-      .sort((a, b) => {
-        const ua = a.deadlineState.kind === "urgent" ? 0 : 1;
-        const ub = b.deadlineState.kind === "urgent" ? 0 : 1;
-        if (ua !== ub) return ua - ub;
-        if (ua === 0) return a.deadline!.getTime() - b.deadline!.getTime();
-        return (b.score ?? 0) - (a.score ?? 0);
-      })
+      .sort((a, b) => priority(b) - priority(a) || a.startAt.getTime() - b.startAt.getTime())
       .slice(0, 25);
     const closing = live
       .filter((e) => e.deadlineState.kind === "urgent" && ((e.score ?? 0) >= prefs.minScore || ["saved", "to_register"].includes(e.status)))
