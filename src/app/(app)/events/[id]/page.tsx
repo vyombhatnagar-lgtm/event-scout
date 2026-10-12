@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DeadlineBadge, DeadlineText, SourceLinks, placeLabel } from "@/components/events/event-card";
+import { AddToCalendar } from "@/components/calendar/add-to-calendar";
 import { StatusControl } from "@/components/events/status-control";
 import { renderOrError } from "@/components/shared/load";
 import { Badge, Card, PageSkeleton, ScoreRing } from "@/components/shared/ui";
@@ -69,6 +70,7 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
             <a href={e.eventUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-md border border-[#d5d8d1] bg-surface px-4 text-sm font-medium text-ink no-underline">
               Open event page
             </a>
+            <AddToCalendar e={e} />
           </div>
           {e.summary && <p className="text-[15px] leading-relaxed text-ink-2">{e.summary}</p>}
           <Card className="px-5 pb-2">

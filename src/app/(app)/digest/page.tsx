@@ -16,7 +16,7 @@ export default function DigestPage() {
     <>
       <PageHeader
         title="Monday digest"
-        sub="Sent automatically every Monday at 08:00 IST (with a 10:00 retry that only sends if 08:00 failed). The preview below is the live content."
+        sub="Sent automatically every Monday at 06:30 IST, right after the 05:00 discovery run (with an 08:00 retry that only sends if 06:30 failed). The preview below is the live content."
         actions={<JobButton job="digest" label="Send test digest now" variant="primary" />}
       />
       <Suspense fallback={<PageSkeleton />}>

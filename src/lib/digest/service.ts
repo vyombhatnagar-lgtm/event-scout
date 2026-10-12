@@ -43,6 +43,7 @@ export async function buildDigest(now = new Date()): Promise<{ content: DigestCo
       sourceNote,
       prefsNote,
       dashboardUrl: `${appUrl()}/dashboard`,
+      appUrl: appUrl(),
       calendlyUrl: prefs.calendlyUrl,
     },
   };

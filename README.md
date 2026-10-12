@@ -5,7 +5,7 @@
 
 Final examination project — MESA School of Business, Cohort C4, *AI and its Applications*. Problem statement: **Industry Event Scout**.
 
-Vikram, an independent management consultant, wins 40% of new business at in-person events but loses ~45 minutes every Monday searching fragmented listings — and still misses deadlines. Event Scout pulls live events from several sources, ranks them for him with Gemini Flash, flags registration deadlines under 7 days, and emails a scannable digest every Monday at 08:00 IST.
+Vikram, an independent management consultant, wins 40% of new business at in-person events but loses ~45 minutes every Monday searching fragmented listings — and still misses deadlines. Event Scout pulls live events from several sources, ranks them for him with Gemini Flash, flags registration deadlines under 7 days, and emails a scannable briefing every Monday at 06:30 IST — before his week starts.
 
 - **Architecture and requirement traceability:** [docs/COMPONENTS_MAP.md](docs/COMPONENTS_MAP.md)
 - **Live app:** https://event-scout-five.vercel.app (open access for review; no sign-in needed)
@@ -21,7 +21,7 @@ Vikram, an independent management consultant, wins 40% of new business at in-per
 | Preferences | Categories, cities, topics, formats, minimum score, digest recipient, Calendly link — stored in the database, editable in the app |
 | Dashboard | Weekly figures, top matches, urgent deadlines, actions, pipeline, source freshness |
 | Pipeline & checklist | Saved → To register → Registered → Attended → Follow-up; weekly tasks derived from real events |
-| Monday digest | Vercel Cron → HTML + text email via Resend, once per week (idempotent), with a 10:00 retry |
+| Monday digest | Vercel Cron → HTML + text email via Resend, once per week (idempotent), with an 08:00 retry |
 | Status | Source health, job history, configuration check |
 
 ## Stack
@@ -70,7 +70,7 @@ npm run test:live
 1. Import the GitHub repo in Vercel.
 2. Storage → Create Database → Neon (prefix `DATABASE`) — this sets `DATABASE_URL` automatically.
 3. Add `GEMINI_API_KEY`, `RESEND_API_KEY`, `DIGEST_RECIPIENT_EMAIL`, `CRON_SECRET` (optional: `APP_PASSWORD`, `SESSION_SECRET`, `CALENDLY_URL`, `GEMINI_MODEL`) in Settings → Environment Variables.
-4. Deploy. Migrations run before the build. `vercel.json` registers the crons: discovery daily 06:00 IST, digest Mondays 08:00 IST (+10:00 retry). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
+4. Deploy. Migrations run before the build. `vercel.json` registers the crons: discovery daily 05:00 IST, digest Mondays 06:30 IST (+08:00 retry). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
 
 The production deployment is set up exactly this way.
 

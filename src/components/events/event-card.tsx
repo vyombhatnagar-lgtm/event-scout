@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Badge, ScoreRing } from "@/components/shared/ui";
 import type { EventView } from "@/lib/services/events";
 import { formatDate, formatEventWhen } from "@/lib/time";
+import { AddToCalendar } from "@/components/calendar/add-to-calendar";
 import { StatusControl } from "./status-control";
 
 export function placeLabel(e: Pick<EventView, "format" | "city" | "venue">) {
@@ -99,6 +100,7 @@ export function EventCard({ e }: { e: EventView }) {
             </a>
           )}
           <StatusControl eventId={e.id} status={e.status} compact />
+          <AddToCalendar e={e} />
           <span className="basis-full sm:ml-auto sm:basis-auto">
             <SourceLinks e={e} />
           </span>

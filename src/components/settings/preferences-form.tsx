@@ -122,7 +122,7 @@ export function PreferencesForm({ initial, isDefault }: { initial: Preferences; 
           </label>
           <label className="flex min-h-9 items-center gap-2.5 text-sm">
             <input type="checkbox" checked={p.digestEnabled} onChange={(e) => set("digestEnabled", e.target.checked)} className="size-[18px] accent-accent" />
-            Send the digest every Monday at 08:00 IST
+            Send the digest every Monday at 06:30 IST
           </label>
           <label className="flex flex-col gap-1.5 text-[13px] font-medium">
             Calendly booking link

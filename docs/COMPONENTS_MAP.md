@@ -70,8 +70,8 @@ flowchart LR
   end
 
   subgraph App["Next.js 16 on Vercel"]
-    CR1[/Cron daily 06:00 IST/]
-    CR2[/Cron Mon 08:00 + 10:00 IST/]
+    CR1[/Cron daily 05:00 IST/]
+    CR2[/Cron Mon 06:30 + 08:00 IST/]
     C1[C1 Connectors]
     C2[C2 Normalise + Zod validation]
     C3[C3 Dedupe]
@@ -151,7 +151,7 @@ Generated only from real data: register (urgent or "to register"), decide (top n
 Next 30 days; urgent deadlines first, then top 12 by fit; dates, locations, reasons, deadline with origin, registration + source links, open checklist items, dashboard link. HTML + plain text. Preview at `/digest`.
 
 ### C11 · Email Delivery — **Mandatory**
-Resend. `digest_runs.idempotency_key` is unique: `scheduled:<user>:<week>` (cron) or `manual:<user>:<minute>`. A sent digest is never resent; a failed one may be retried (atomic claim); the same key is passed to Resend's `idempotencyKey` so a timed-out request cannot double-send. Every attempt logged in `notification_logs`. Two Monday crons (08:00, 10:00 IST) give an automatic retry.
+Resend. `digest_runs.idempotency_key` is unique: `scheduled:<user>:<week>` (cron) or `manual:<user>:<minute>`. A sent digest is never resent; a failed one may be retried (atomic claim); the same key is passed to Resend's `idempotencyKey` so a timed-out request cannot double-send. Every attempt logged in `notification_logs`. Two Monday crons (06:30, 08:00 IST) give an automatic retry.
 
 ### C12 · Google Calendar — Enhancement ⬜ (Phase 7)
 Planned: OAuth (`calendar.events` scope), add selected events + deadline reminder, `calendar_links` table, duplicate prevention, revoked-access handling.
@@ -204,9 +204,9 @@ Change from the original plan: **Neon replaces Supabase**, provisioned through t
 
 | Job | UTC | IST | Route |
 |---|---|---|---|
-| Discovery + AI | daily 00:30 | 06:00 | `/api/cron/discover` |
-| Digest | Mon 02:30 | Mon 08:00 | `/api/cron/digest` |
-| Digest retry (sends only if 08:00 failed) | Mon 04:30 | Mon 10:00 | `/api/cron/digest` |
+| Discovery + AI | daily 23:30 | 05:00 | `/api/cron/discover` |
+| Digest | Mon 01:00 | Mon 06:30 | `/api/cron/digest` |
+| Digest retry (sends only if 06:30 failed) | Mon 02:30 | Mon 08:00 | `/api/cron/digest` |
 
 ---
 
@@ -233,7 +233,7 @@ Change from the original plan: **Neon replaces Supabase**, provisioned through t
 | Email | Manual digest delivered via Resend; repeat in the same minute blocked | ✅ |
 | Cron | `/api/cron/*` returns 401 without `CRON_SECRET` | ✅ |
 | Cron | Scheduled digest endpoint sent this week's digest once; second call "Already sent for this week" | ✅ |
-| Cron | Three schedules registered in Vercel (discovery daily, digest Mon 08:00 + 10:00 IST) | ✅ |
+| Cron | Three schedules registered in Vercel (discovery daily 05:00, digest Mon 06:30 + 08:00 IST) | ✅ |
 | Build | `next build` + `tsc` + ESLint clean | ✅ |
 | Deployment | Public URL loads; production integrations work | ✅ |
 

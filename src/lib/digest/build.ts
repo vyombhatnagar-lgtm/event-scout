@@ -10,6 +10,7 @@ export interface DigestContent {
   sourceNote: string;
   prefsNote: string;
   dashboardUrl: string;
+  appUrl: string;
   calendlyUrl: string | null;
 }
 

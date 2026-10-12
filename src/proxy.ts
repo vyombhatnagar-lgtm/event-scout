@@ -1,7 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE, isValidSession } from "@/lib/auth";
 
-const PUBLIC = [/^\/login$/, /^\/api\/auth\//, /^\/api\/cron\//];
+// Calendar files are linked from the email, so they open without a session.
+const PUBLIC = [/^\/login$/, /^\/api\/auth\//, /^\/api\/cron\//, /^\/api\/events\/[0-9a-f-]{36}\/ics$/];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
