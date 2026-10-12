@@ -53,9 +53,13 @@ export async function savePreferences(userId: string, p: Preferences) {
     .onConflictDoUpdate({ target: schema.userPreferences.userId, set: values });
 }
 
+/** Bump when the deterministic scoring rules change, so stored scores are recomputed. */
+const RULES_VERSION = 2;
+
 /** Scores depend only on these fields; a change invalidates stored scores. */
 export function prefsHash(p: Preferences): string {
   const relevant = {
+    rules: RULES_VERSION,
     categories: [...p.categories].sort(),
     cities: [...p.cities].sort(),
     topics: [...p.topics].sort(),

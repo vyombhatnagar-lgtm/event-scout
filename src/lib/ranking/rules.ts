@@ -12,10 +12,10 @@ export interface RankableEvent {
 }
 
 export interface RuleBreakdown {
-  location: number; // 0–35
-  format: number; // 0–15
-  topic: number; // 0–35
-  timing: number; // 0–15
+  location: number; // 0–25
+  format: number; // 0–10
+  topic: number; // 0–60
+  timing: number; // 0–5
   total: number; // 0–100
   matchedTopics: string[];
   inTargetCity: boolean;
@@ -36,25 +36,26 @@ export function topicMatches(topic: string, text: string): boolean {
 
 /**
  * Deterministic half of the relevance score. Same inputs → same score, always.
- * Weights: location 35, topic/category 35, format 15, timing 15.
+ * Topic fit dominates (60): being in the right city is necessary but not sufficient.
+ * Weights: topic/category 60, location 25, format 10, timing 5.
  */
 export function ruleScore(e: RankableEvent, p: Preferences, now: Date): RuleBreakdown {
   const inTargetCity = cityMatches(e.city, p.cities);
   const isOnline = e.format === "online";
 
   let location = 0;
-  if (isOnline) location = p.formats.includes("online") ? 25 : 0;
-  else if (inTargetCity) location = 35;
+  if (isOnline) location = p.formats.includes("online") ? 18 : 0;
+  else if (inTargetCity) location = 25;
 
   let format = 0;
-  if (p.formats.includes(e.format)) format = 15;
-  else if (e.format === "unknown") format = 7;
+  if (p.formats.includes(e.format)) format = 10;
+  else if (e.format === "unknown") format = 5;
 
   const text = `${e.title}\n${e.description ?? ""}\n${e.categories.join(" ")}`;
   const matchedTopics = [...p.topics, ...p.categories].filter((t) => topicMatches(t, text));
-  const topic = Math.min(35, matchedTopics.length * 12);
+  const topic = [0, 35, 50, 60][Math.min(3, matchedTopics.length)];
 
-  const timing = e.startAt.getTime() >= now.getTime() ? 15 : 0;
+  const timing = e.startAt.getTime() >= now.getTime() ? 5 : 0;
 
   return { location, format, topic, timing, total: location + format + topic + timing, matchedTopics, inTargetCity };
 }
@@ -64,9 +65,13 @@ export const AI_WEIGHT = 0.65;
 /** Ceiling for events that fail a hard preference (wrong city, unwanted online). */
 export const HARD_MISMATCH_CAP = 35;
 
+/** Without Gemini, an event matching none of the user's topics cannot pass a typical minimum score. */
+export const NO_TOPIC_CAP = 40;
+
 /** Blend rules with Gemini's assessment; hard preference mismatches are capped so AI cannot override them. */
 export function finalScore(rules: RuleBreakdown, aiScore: number | null, e: Pick<RankableEvent, "format">, p: Preferences): number {
   let score = aiScore == null ? rules.total : Math.round(RULE_WEIGHT * rules.total + AI_WEIGHT * aiScore);
+  if (aiScore == null && rules.matchedTopics.length === 0) score = Math.min(score, NO_TOPIC_CAP);
   const wrongPlace = e.format !== "online" && !rules.inTargetCity;
   const unwantedOnline = e.format === "online" && !p.formats.includes("online");
   if (wrongPlace || unwantedOnline) score = Math.min(score, HARD_MISMATCH_CAP);

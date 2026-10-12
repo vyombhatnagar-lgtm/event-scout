@@ -59,6 +59,10 @@ describe("preferences change results", () => {
     const r = ruleScore(relevant, prefs, now);
     expect(finalScore(r, null, relevant, prefs)).toBe(r.total);
   });
+  it("without AI, an in-city event matching no topic stays below the default minimum", () => {
+    const generic = { ...irrelevant, title: "Free DevOps Demo Class", description: "Hands-on tooling demo." };
+    expect(finalScore(ruleScore(generic, prefs, now), null, generic, prefs)).toBeLessThan(prefs.minScore);
+  });
 });
 
 describe("AI deadline evidence guard", () => {
