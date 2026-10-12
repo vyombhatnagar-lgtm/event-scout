@@ -5,6 +5,8 @@ export interface ConnectorContext {
   cities: CityRef[];
   windowStart: Date;
   windowEnd: Date;
+  /** The user's focus areas, for sources that search (web search). */
+  focus?: { categories: string[]; topics: string[] };
 }
 
 export interface ConnectorResult {

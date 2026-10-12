@@ -73,6 +73,8 @@ export async function generateStructured<T>(opts: {
   timeoutMs?: number;
   /** MINIMAL for simple labelling tasks (faster), LOW where judgement matters. */
   thinking?: ThinkingLevel;
+  /** Let Gemini search Google. The JSON is then read from the text (validated just the same). */
+  googleSearch?: boolean;
 }): Promise<T> {
   const attempts = opts.attempts ?? 3;
   let lastErr: AiError | null = null;
@@ -85,9 +87,12 @@ export async function generateStructured<T>(opts: {
           model,
           contents: opts.prompt,
           config: {
-            systemInstruction: opts.system,
-            responseMimeType: "application/json",
-            responseJsonSchema: opts.jsonSchema,
+            systemInstruction: opts.googleSearch
+              ? `${opts.system}\n\nReply with ONLY a JSON object matching this JSON Schema, no prose:\n${JSON.stringify(opts.jsonSchema)}`
+              : opts.system,
+            ...(opts.googleSearch
+              ? { tools: [{ googleSearch: {} }] }
+              : { responseMimeType: "application/json", responseJsonSchema: opts.jsonSchema }),
             temperature: 0,
             thinkingConfig: { thinkingLevel: opts.thinking ?? ThinkingLevel.LOW },
             httpOptions: { timeout: opts.timeoutMs ?? 90_000 },
@@ -97,7 +102,7 @@ export async function generateStructured<T>(opts: {
         if (!text) throw new AiError("Empty response from Gemini", "invalid_output");
         let json: unknown;
         try {
-          json = JSON.parse(text);
+          json = JSON.parse(opts.googleSearch ? jsonFromText(text) : text);
         } catch {
           throw new AiError("Gemini returned malformed JSON", "invalid_output");
         }
@@ -124,6 +129,15 @@ export async function generateStructured<T>(opts: {
     throw new AiError(`Gemini quota reached for ${geminiModels().join(", ")} — remaining events will be processed on the next run`, "rate_limit");
   }
   throw lastErr ?? new AiError("Gemini call failed", "api");
+}
+
+/** Pull the JSON object out of a free-text reply (strips ```json fences and surrounding prose). */
+export function jsonFromText(text: string): string {
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const body = fenced ? fenced[1] : text;
+  const start = body.indexOf("{");
+  const end = body.lastIndexOf("}");
+  return start >= 0 && end > start ? body.slice(start, end + 1) : body;
 }
 
 function toAiError(e: unknown, model: string): AiError {

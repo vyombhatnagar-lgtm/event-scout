@@ -9,11 +9,12 @@ import { customSources } from "./connectors/custom";
 import { eventbrite } from "./connectors/eventbrite";
 import { luma } from "./connectors/luma";
 import { meetup } from "./connectors/meetup";
+import { webSearch } from "./connectors/websearch";
 import { type Connector, errMsg, mapLimit } from "./connectors/types";
 import { deduplicate, type MergedCandidate } from "./deduplicate";
 import { normalise } from "./normalise";
 
-export const CONNECTORS: Connector[] = [luma, eventbrite, meetup, customSources];
+export const CONNECTORS: Connector[] = [luma, eventbrite, meetup, customSources, webSearch];
 
 export interface SourceReport {
   source: string;
@@ -31,9 +32,17 @@ export interface DiscoveryReport {
 }
 
 /** Fetch every connector, validate, de-duplicate and persist. A failing source never blocks the others. */
-export async function runDiscovery(cityNames: string[], now = new Date()): Promise<DiscoveryReport> {
+export async function runDiscovery(
+  prefs: { cities: string[]; categories: string[]; topics: string[] },
+  now = new Date(),
+): Promise<DiscoveryReport> {
   const { from, to } = discoveryWindow(now);
-  const ctx = { cities: cityNames.map(resolveCity), windowStart: from, windowEnd: to };
+  const ctx = {
+    cities: prefs.cities.map(resolveCity),
+    windowStart: from,
+    windowEnd: to,
+    focus: { categories: prefs.categories, topics: prefs.topics },
+  };
 
   const accepted: CandidateEvent[] = [];
   const reports = await Promise.all(

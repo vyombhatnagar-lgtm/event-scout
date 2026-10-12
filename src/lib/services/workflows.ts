@@ -16,7 +16,7 @@ export function discoveryJob(trigger: "cron" | "manual") {
     const started = Date.now();
     const user = await getUser();
     const prefs = await getPreferences(user.id);
-    const discovery = await runDiscovery(prefs.cities);
+    const discovery = await runDiscovery(prefs);
     const details = await enrichEventbriteDetails();
     const ai = emptyAiReport();
     const budgetEnds = started + AI_BUDGET_MS;

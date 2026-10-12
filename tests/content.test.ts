@@ -67,3 +67,18 @@ describe("custom source content", () => {
     expect(verifyQuote("CTO Roundtable", "the cio roundtable is on")).toBe(false);
   });
 });
+
+describe("web search verification", async () => {
+  const { pageMentionsDate } = await import("@/lib/discovery/connectors/websearch");
+  const d = new Date("2026-10-28T12:30:00Z"); // 28 Oct IST
+  it("finds the event date written in common formats", () => {
+    expect(pageMentionsDate("Join us on 28th October 2026", d)).toBe(true);
+    expect(pageMentionsDate("Date: Oct 28, 2026", d)).toBe(true);
+    expect(pageMentionsDate("When: 28/10/2026, 6 PM", d)).toBe(true);
+    expect(pageMentionsDate("2026-10-28T18:00", d)).toBe(true);
+  });
+  it("rejects pages that do not mention that date", () => {
+    expect(pageMentionsDate("Join us on 29 October", d)).toBe(false);
+    expect(pageMentionsDate("Coming soon", d)).toBe(false);
+  });
+});
