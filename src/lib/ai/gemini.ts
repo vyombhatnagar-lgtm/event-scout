@@ -1,5 +1,7 @@
 import "server-only";
 import { ApiError, GoogleGenAI, ThinkingLevel } from "@google/genai";
+
+export { ThinkingLevel };
 import type { z } from "zod";
 
 /**
@@ -34,6 +36,7 @@ export class AiError extends Error {
   constructor(
     message: string,
     readonly kind: "config" | "rate_limit" | "timeout" | "api" | "invalid_output",
+    readonly overloaded = false,
   ) {
     super(message);
   }
@@ -68,6 +71,8 @@ export async function generateStructured<T>(opts: {
   validator: z.ZodType<T>;
   attempts?: number;
   timeoutMs?: number;
+  /** MINIMAL for simple labelling tasks (faster), LOW where judgement matters. */
+  thinking?: ThinkingLevel;
 }): Promise<T> {
   const attempts = opts.attempts ?? 2;
   let lastErr: AiError | null = null;
@@ -84,7 +89,7 @@ export async function generateStructured<T>(opts: {
             responseMimeType: "application/json",
             responseJsonSchema: opts.jsonSchema,
             temperature: 0,
-            thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+            thinkingConfig: { thinkingLevel: opts.thinking ?? ThinkingLevel.LOW },
             httpOptions: { timeout: opts.timeoutMs ?? 90_000 },
           },
         });
@@ -107,6 +112,8 @@ export async function generateStructured<T>(opts: {
           exhausted.add(model);
           break; // try the next Flash model
         }
+        if (lastErr.overloaded) break; // 503: this model is busy right now — try the next Flash model
+
         if (i < attempts - 1) await sleep(3_000 * 2 ** i);
       }
     }
@@ -123,7 +130,7 @@ function toAiError(e: unknown, model: string): AiError {
     if (e.status === 429) return new AiError(`Gemini rate limit reached (${model})`, "rate_limit");
     if (e.status === 400 || e.status === 401 || e.status === 403) return new AiError(`Gemini rejected the request (${e.status}): ${e.message.slice(0, 200)}`, "config");
     if (e.status === 404) return new AiError(`Gemini model not found: ${model}`, "api");
-    return new AiError(`Gemini API error ${e.status} (${model})`, "api");
+    return new AiError(`Gemini API error ${e.status} (${model})`, "api", e.status === 503);
   }
   const msg = e instanceof Error ? e.message : String(e);
   if (/abort|timeout/i.test(msg)) return new AiError("Gemini request timed out", "timeout");
