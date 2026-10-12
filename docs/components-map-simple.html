@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Event Scout: Components Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Instrument Sans", Arial, sans-serif; color: #1F231C; background: #F4F2ED; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 297mm; height: 210mm; padding: 12mm 14mm; display: flex; flex-direction: column; gap: 6mm; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1.5px solid #1F231C; padding-bottom: 3mm; }
+  h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: 34pt; line-height: 1; margin: 0; }
+  .sub { font-size: 11pt; color: #62665D; margin-top: 2mm; }
+  .links { text-align: right; font-size: 9pt; color: #62665D; line-height: 1.6; }
+  .links b { color: #1F231C; }
+  .grid { flex: 1; display: grid; grid-template-columns: 1fr 9mm 1fr 9mm 1fr; grid-template-rows: 1fr 9mm 1fr 9mm 1fr; }
+  .box { background: #fff; border-radius: 4mm; padding: 3.5mm 4.5mm; box-shadow: 0 .4mm 1.2mm rgba(0,0,0,.06); display: flex; gap: 3.5mm; align-items: flex-start; }
+  .n { flex: 0 0 9mm; height: 9mm; border-radius: 50%; color: #fff; font-weight: 700; font-size: 12pt; display: flex; align-items: center; justify-content: center; }
+  .t { font-size: 12.5pt; font-weight: 700; margin: .6mm 0 1mm; }
+  .d { font-size: 9.6pt; line-height: 1.35; color: #33372F; }
+  .w { font-size: 8.8pt; line-height: 1.3; color: #62665D; margin-top: 1.4mm; }
+  .w b { color: #1F231C; font-weight: 600; }
+  .a { display: flex; align-items: center; justify-content: center; color: #8A8E83; font-size: 15pt; }
+  footer { display: flex; justify-content: space-between; font-size: 8.5pt; color: #62665D; }
+</style>
+</head>
+<body>
+<section class="page">
+  <header>
+    <div>
+      <h1>Event Scout: Components Map</h1>
+      <div class="sub">Finds industry events for Vikram, ranks them, flags deadlines and emails him every Monday.</div>
+    </div>
+    <div class="links">Live app: <b>event-scout-five.vercel.app</b><br>Code: <b>github.com/vyombhatnagar-lgtm/event-scout</b></div>
+  </header>
+
+  <div class="grid">
+    <!-- row 1: 1 → 2 → 3 -->
+    <div class="box"><div class="n" style="background:#2A4A8A">1</div><div>
+      <div class="t">Event Sources</div>
+      <div class="d">Eventbrite, Luma, Meetup and AllEvents, plus any event link Vikram pastes in.</div>
+      <div class="w"><b>Why:</b> events are scattered across many sites, so we collect them in one place.</div></div></div>
+    <div class="a">→</div>
+    <div class="box"><div class="n" style="background:#1F5F4A">2</div><div>
+      <div class="t">Discovery Engine</div>
+      <div class="d">Fetches events every day, cleans them into one format and removes duplicates.</div>
+      <div class="w"><b>Why:</b> the same event is often listed on two or three sites.</div></div></div>
+    <div class="a">→</div>
+    <div class="box"><div class="n" style="background:#C2410C">3</div><div>
+      <div class="t">Deadline Check</div>
+      <div class="d">Reads the registration closing date from the event page. Under 7 days is marked urgent.</div>
+      <div class="w"><b>Why:</b> Vikram's main problem was missing deadlines. We never guess a date.</div></div></div>
+
+    <div></div><div></div><div></div><div></div><div class="a">↓</div>
+
+    <!-- row 2: 6 ← 5 ← 4 -->
+    <div class="box"><div class="n" style="background:#7A4E0F">6</div><div>
+      <div class="t">Database (Neon)</div>
+      <div class="d">Stores events, scores, Vikram's preferences and his tasks.</div>
+      <div class="w"><b>Why:</b> preferences can change without touching code, and nothing is lost between weeks.</div></div></div>
+    <div class="a">←</div>
+    <div class="box"><div class="n" style="background:#5B3E96">5</div><div>
+      <div class="t">Ranking</div>
+      <div class="d">Final score = 35% Vikram's preferences (cities, topics) + 65% Gemini's score.</div>
+      <div class="w"><b>Why:</b> fixed rules keep it consistent; AI adds judgement about the audience.</div></div></div>
+    <div class="a">←</div>
+    <div class="box"><div class="n" style="background:#1D6B66">4</div><div>
+      <div class="t">AI: Gemini Flash</div>
+      <div class="d">Summarises each event and gives a fit score from 0 to 100 with a one line reason.</div>
+      <div class="w"><b>Why:</b> required by the brief. AI output is checked against the source text.</div></div></div>
+
+    <div class="a">↓</div><div></div><div></div><div></div><div></div>
+
+    <!-- row 3: 7 → 8 → 9 -->
+    <div class="box"><div class="n" style="background:#3C4656">7</div><div>
+      <div class="t">Scheduler (Vercel Cron)</div>
+      <div class="d">Runs discovery daily at 5:00 AM and sends the briefing every Monday at 6:30 AM.</div>
+      <div class="w"><b>Why:</b> it runs on its own, so Vikram does not have to do anything.</div></div></div>
+    <div class="a">→</div>
+    <div class="box"><div class="n" style="background:#8E2F45">8</div><div>
+      <div class="t">Monday Email (Resend)</div>
+      <div class="d">Urgent deadlines first, then the best matches, each with register and calendar links.</div>
+      <div class="w"><b>Why:</b> replaces his 45 minutes of manual searching every Monday.</div></div></div>
+    <div class="a">→</div>
+    <div class="box"><div class="n" style="background:#1F231C">9</div><div>
+      <div class="t">Dashboard (Next.js on Vercel)</div>
+      <div class="d">Today view, Explore, My events and Settings. Save, register, add to calendar, track tasks.</div>
+      <div class="w"><b>Why:</b> one place to decide quickly and follow up through the week.</div></div></div>
+  </div>
+
+  <footer><span>Built with Next.js · Neon · Gemini Flash · Resend · Vercel · GitHub</span><span>All AI in the app uses Gemini Flash only</span></footer>
+</section>
+</body>
+</html>
