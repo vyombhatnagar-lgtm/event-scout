@@ -79,7 +79,7 @@ export function WeekGlance({ now, events, minScore }: { now: Date; events: Event
             const weekend = [0, 6].includes(c.date.getUTCDay());
             const empty = !c.going.length && !c.listed.length && !c.ideas.length && !c.closing.length;
             return (
-              <li key={c.key} className={`flex min-h-[220px] flex-col gap-2 rounded-[18px] p-2.5 ${isToday ? "bg-brand-soft" : weekend ? "bg-[#F1EEE7]" : "bg-[#F7F5F0]"}`}>
+              <li key={c.key} className={`flex min-h-[180px] flex-col gap-2 rounded-[18px] p-2.5 ${isToday ? "bg-brand-soft" : weekend ? "bg-[#F1EEE7]" : "bg-[#F7F5F0]"}`}>
                 <div className="flex items-baseline justify-between px-1">
                   <span className={`text-xs font-semibold tracking-[0.06em] uppercase ${isToday ? "text-brand" : "text-muted"}`}>{isToday ? "Today" : formatDate(c.date, { weekday: "short" })}</span>
                   <span className={`text-lg leading-none font-semibold ${isToday ? "text-brand" : ""}`}>{formatDate(c.date, { day: "numeric" })}</span>
