@@ -53,7 +53,7 @@ export async function runDiscovery(
         .returning({ id: schema.sourceRuns.id });
       let report: SourceReport;
       try {
-        const { candidates, errors } = await c.fetch(ctx);
+        const { candidates, errors, deferred } = await c.fetch(ctx);
         const rejected: string[] = [];
         let ok = 0;
         for (const raw of candidates) {
@@ -66,8 +66,9 @@ export async function runDiscovery(
           accepted.push(n.event);
           ok++;
         }
-        const allErrors = [...errors, ...rejected.slice(0, 10).map((r) => `rejected ${r}`)];
-        const status = candidates.length === 0 && errors.length > 0 ? "failed" : errors.length > 0 ? "partial" : "success";
+        const allErrors = [...(deferred ? [deferred] : []), ...errors, ...rejected.slice(0, 10).map((r) => `rejected ${r}`)];
+        // "failed" = the source is genuinely down; postponed work (quota) is "partial", never a failure.
+        const status = candidates.length === 0 && errors.length > 0 ? "failed" : errors.length > 0 || deferred ? "partial" : "success";
         report = { source: c.name, status, retrieved: candidates.length, accepted: ok, errors: allErrors };
       } catch (e) {
         report = { source: c.name, status: "failed", retrieved: 0, accepted: 0, errors: [errMsg(e)] };

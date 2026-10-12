@@ -1,14 +1,14 @@
 import "server-only";
 import { z } from "zod";
 import { verifyDeadlineEvidence, verifyQuote } from "@/lib/ai/evidence";
-import { generateStructured } from "@/lib/ai/gemini";
+import { AiError, generateStructured } from "@/lib/ai/gemini";
 import { localDate } from "@/lib/time";
 import type { CandidateEventInput } from "@/types/event";
 import { canonicalCity } from "../cities";
 import { normaliseTitle } from "../normalise";
 import { htmlToText, ldToCandidate } from "./content";
 import { extractLdEvents, stripQuery } from "./jsonld";
-import { type Connector, errMsg, fetchText, sleep } from "./types";
+import { type Connector, QUOTA_NOTE, errMsg, fetchText, sleep } from "./types";
 
 const SOURCE = "Web search (Gemini)";
 const MAX_RESULTS = 12;
@@ -94,6 +94,7 @@ Prioritise CXO/CIO/CFO roundtables, leadership summits, industry conferences and
     try {
       found = (await generateStructured({ system: SYSTEM, prompt, jsonSchema: schema, validator: Output, googleSearch: true, attempts: 2, timeoutMs: 120_000 })).events;
     } catch (e) {
+      if (e instanceof AiError && e.kind === "rate_limit") return { candidates, errors: [], deferred: QUOTA_NOTE };
       return { candidates, errors: [`search: ${errMsg(e)}`] };
     }
 

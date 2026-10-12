@@ -13,7 +13,11 @@ export interface ConnectorResult {
   candidates: CandidateEventInput[];
   /** Non-fatal problems (one city failed, one page malformed…). Recorded in source_runs. */
   errors: string[];
+  /** Work postponed for an expected reason (e.g. daily Gemini quota) — not a failure. */
+  deferred?: string;
 }
+
+export const QUOTA_NOTE = "Waiting for Gemini quota — resets daily at 12:30 IST; runs on the next discovery";
 
 export interface Connector {
   name: string;

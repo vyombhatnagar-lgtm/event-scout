@@ -26,7 +26,11 @@ export function SourceTable({ rows }: { rows: Awaited<ReturnType<typeof latestSo
               <td className="px-4 py-3 font-mono text-[13px]">{r.accepted}</td>
               <td className="px-4 py-3">
                 <Badge tone={r.status === "success" ? "ok" : r.status === "failed" ? "urgent" : r.status === "partial" ? "warn" : "neutral"}>
-                  {r.status === "partial" ? `Partial · ${r.errors.length} issue${r.errors.length === 1 ? "" : "s"}` : r.status}
+                  {r.status === "partial" && r.errors[0]?.startsWith("Waiting for Gemini quota")
+                    ? "Waiting for AI quota"
+                    : r.status === "partial"
+                      ? `Partial · ${r.errors.length} issue${r.errors.length === 1 ? "" : "s"}`
+                      : r.status}
                 </Badge>
               </td>
             </tr>
