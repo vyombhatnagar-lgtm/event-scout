@@ -145,6 +145,7 @@ async function persist(groups: MergedCandidate[]) {
           ? false
           : null,
       priceText: p.priceText,
+      imageUrl: p.imageUrl ?? g.sources.map((s) => s.imageUrl).find(Boolean) ?? null,
       lastVerifiedAt: now,
       updatedAt: now,
     };

@@ -15,9 +15,9 @@ export default function DigestPage() {
   return (
     <>
       <PageHeader
-        title="Monday digest"
+        title="Monday briefing"
         sub="Sent automatically every Monday at 06:30 IST, right after the 05:00 discovery run (with an 08:00 retry that only sends if 06:30 failed). The preview below is the live content."
-        actions={<JobButton job="digest" label="Send test digest now" variant="primary" />}
+        actions={<JobButton job="digest" label="Send me a test briefing" variant="primary" />}
       />
       <Suspense fallback={<PageSkeleton />}>
         <DigestInfo />
@@ -26,7 +26,7 @@ export default function DigestPage() {
         <SectionTitle id="prev-h" aside={<a href="/api/digest/preview?format=text" target="_blank" rel="noopener noreferrer">Plain-text version</a>}>
           Preview
         </SectionTitle>
-        <iframe title="Digest email preview" src="/api/digest/preview" className="h-[1200px] w-full rounded-lg border border-line bg-[#ecede9]" />
+        <iframe title="Digest email preview" src="/api/digest/preview" className="h-[1400px] w-full rounded-[22px] bg-[#F3F2EE] shadow-[var(--shadow-soft)]" />
       </section>
     </>
   );

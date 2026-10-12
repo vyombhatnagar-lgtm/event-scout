@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const plexSans = IBM_Plex_Sans({ variable: "--font-plex-sans", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
-const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500"] });
+const ui = Instrument_Sans({ variable: "--font-ui", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const display = Instrument_Serif({ variable: "--font-display", subsets: ["latin"], weight: "400", style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   title: { default: "Event Scout", template: "%s · Event Scout" },
-  description: "AI-powered event intelligence for business development. Find the right rooms. Never miss the opportunity.",
+  description: "Your week of rooms worth entering — live events ranked for you, with deadlines you won't miss.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}>
-      <body className="min-h-full font-sans">{children}</body>
+    <html lang="en" className={`${ui.variable} ${display.variable} h-full antialiased`}>
+      <body className="min-h-full font-sans text-[15px]">{children}</body>
     </html>
   );
 }

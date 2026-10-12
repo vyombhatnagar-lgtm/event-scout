@@ -35,6 +35,7 @@ export interface EventView {
   deadlineConflict: boolean;
   deadlineState: DeadlineState;
   priceText: string | null;
+  imageUrl: string | null;
   aiStatus: string;
   score: number | null;
   aiScore: number | null;
@@ -96,6 +97,7 @@ function toView(r: Row, sources: SourceRef[], now: Date): EventView {
     deadlineConflict: e.deadlineConflict,
     deadlineState: deadlineState(e.registrationDeadline, now),
     priceText: e.priceText,
+    imageUrl: e.imageUrl,
     aiStatus: e.aiStatus,
     score: r.s?.finalScore ?? null,
     aiScore: r.s?.aiScore ?? null,

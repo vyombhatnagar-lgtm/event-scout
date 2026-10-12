@@ -6,7 +6,7 @@ export function SourceTable({ rows }: { rows: Awaited<ReturnType<typeof latestSo
   if (rows.length === 0) return <EmptyState title="No source runs yet">Run discovery to fetch from Luma, Eventbrite and Meetup.</EmptyState>;
   const fmt = (s: string | null) => (s ? formatDate(new Date(s), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false }) : "Never");
   return (
-    <div className="overflow-x-auto rounded-lg border border-line bg-surface">
+    <div className="overflow-x-auto rounded-[22px] bg-surface shadow-[var(--shadow-soft)]">
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
           <tr className="text-left text-xs tracking-wider text-muted uppercase">

@@ -22,7 +22,8 @@ export const DIGEST_MAX_EVENTS = 12;
  *  - ranked: the top relevant events in the next 30 days (≥ minScore)
  * Events whose deadline has passed are excluded from "ranked" unless a source says registration is open.
  */
-export function selectDigestEvents(events: EventView[], minScore: number) {
+export function selectDigestEvents(all: EventView[], minScore: number) {
+  const events = all.filter((e) => e.status !== "dismissed"); // "Not for me" never comes back
   const relevant = events.filter(
     (e) => e.score != null && e.score >= minScore && !(e.deadlineState.kind === "closed" && e.registrationOpen !== true),
   );

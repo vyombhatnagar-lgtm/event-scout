@@ -11,6 +11,7 @@ export const STATUS_LABELS: Record<PipelineStatus, string> = {
   registered: "Registered",
   attended: "Attended",
   follow_up_complete: "Follow-up complete",
+  dismissed: "Not for me",
 };
 
 async function put(eventId: string, status: PipelineStatus) {
@@ -51,7 +52,7 @@ export function StatusControl({ eventId, status, compact = false }: { eventId: s
           type="button"
           disabled={pending}
           onClick={() => update("saved")}
-          className="inline-flex min-h-10 items-center rounded-md border border-[#d5d8d1] bg-surface px-3 text-[13px] font-medium hover:border-ink-2 disabled:opacity-60"
+          className="inline-flex min-h-10 items-center rounded-xl border border-line bg-surface px-3 text-[13px] font-medium transition hover:border-faint disabled:opacity-60"
         >
           Save
         </button>
@@ -62,7 +63,7 @@ export function StatusControl({ eventId, status, compact = false }: { eventId: s
           value={current}
           disabled={pending}
           onChange={(e) => update(e.target.value as PipelineStatus)}
-          className="min-h-10 rounded-md border border-[#c9cdc5] bg-surface px-2 text-[13px] text-ink disabled:opacity-60"
+          className="min-h-10 rounded-xl border border-line bg-surface px-2.5 text-[13px] text-ink disabled:opacity-60"
         >
           {Object.entries(STATUS_LABELS).map(([v, l]) => (
             <option key={v} value={v}>

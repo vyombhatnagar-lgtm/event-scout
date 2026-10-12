@@ -1,23 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --ground: #f4f5f2;
+  --ground: #f4f2ed;
   --surface: #ffffff;
-  --ink: #111418;
-  --ink-2: #3d434b;
-  --muted: #59606b;
-  --line: #e2e4df;
-  --line-2: #eeefeb;
-  --accent: #1f4e79;
-  --accent-ink: #163a5c;
-  --accent-soft: #e8eef4;
-  --urgent: #9a3c07;
-  --urgent-soft: #fceee3;
-  --ok: #2d5a1e;
-  --ok-soft: #eaf2e3;
-  --warn-soft: #fff8e6;
-  --warn-ink: #5c4710;
-  --nav: #111418;
+  --ink: #1f231c;
+  --ink-2: #33372f;
+  --muted: #62665d;
+  --faint: #8a8e83;
+  --line: #e4e0d6;
+  --line-2: #eeeae1;
+  --brand: #1f5f4a;
+  --brand-ink: #123d2f;
+  --brand-soft: #e4eee6;
+  --urgent: #c2410c;
+  --urgent-soft: #fdf1ea;
+  --warn: #9a6416;
+  --warn-soft: #fbf5e8;
+  --ok: #2f7d55;
+  --ok-soft: #e6f2ea;
+  --night: #1f231c;
+  --night-2: #2e332a;
 }
 
 @theme inline {
@@ -26,36 +28,69 @@
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-muted: var(--muted);
+  --color-faint: var(--faint);
   --color-line: var(--line);
   --color-line-2: var(--line-2);
-  --color-accent: var(--accent);
-  --color-accent-ink: var(--accent-ink);
-  --color-accent-soft: var(--accent-soft);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
   --color-urgent: var(--urgent);
   --color-urgent-soft: var(--urgent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
-  --color-warn-soft: var(--warn-soft);
-  --color-warn-ink: var(--warn-ink);
-  --color-nav: var(--nav);
-  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --color-night: var(--night);
+  --color-night-2: var(--night-2);
+  /* legacy aliases used by older components */
+  --color-accent: var(--brand);
+  --color-accent-ink: var(--brand-ink);
+  --color-accent-soft: var(--brand-soft);
+  --color-warn-ink: var(--warn);
+  --font-sans: var(--font-ui), system-ui, sans-serif;
+  --font-serif: var(--font-display), Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", monospace;
+  --shadow-soft: 0 1px 2px rgb(31 35 28 / 0.04), 0 10px 30px rgb(31 35 28 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(31 35 28 / 0.05), 0 16px 40px rgb(31 35 28 / 0.12);
+  --animate-deal: deal 0.35s ease both;
+  @keyframes deal {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
-/* Base styles live in the base layer so Tailwind utilities (e.g. text-white on a button-link) always win. */
+/* Base styles live in the base layer so Tailwind utilities always win. */
 @layer base {
   body {
     background: var(--ground);
     color: var(--ink);
   }
   a {
-    color: var(--accent);
+    color: var(--brand);
   }
   a:hover {
-    color: var(--accent-ink);
+    color: var(--brand-ink);
   }
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--brand);
     outline-offset: 2px;
+  }
+  ::selection {
+    background: #cfe6da;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -14,7 +14,7 @@ export interface SourceVM {
   eventsFound: number;
 }
 
-const input = "min-h-11 rounded-md border border-[#c9cdc5] bg-surface px-3 text-sm";
+const input = "min-h-11 rounded-xl border border-line bg-surface px-3 text-sm";
 
 /** Manage extra sources: conference sites, iSPIRT pages, newsletter feeds, iCal feeds. */
 export function SourcesManager({ initial }: { initial: SourceVM[] }) {
@@ -32,7 +32,7 @@ export function SourcesManager({ initial }: { initial: SourceVM[] }) {
   };
 
   return (
-    <section aria-labelledby="src-h" className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-6">
+    <section aria-labelledby="src-h" className="flex flex-col gap-4 rounded-[22px] bg-surface shadow-[var(--shadow-soft)] p-6">
       <div>
         <h2 id="src-h" className="text-[17px] font-semibold">
           Sources
@@ -41,7 +41,7 @@ export function SourcesManager({ initial }: { initial: SourceVM[] }) {
           Built in: Luma, Eventbrite, Meetup and Gemini web search. Add conference sites, iSPIRT pages, newsletter RSS feeds or iCal feeds below — they are checked daily.
         </p>
       </div>
-      <ul className="flex flex-col divide-y divide-line-2 rounded-md border border-line">
+      <ul className="flex flex-col divide-y divide-line-2 rounded-xl border border-line">
         {initial.length === 0 && <li className="px-4 py-3 text-sm text-muted">No extra sources yet.</li>}
         {initial.map((s) => (
           <li key={s.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
@@ -61,13 +61,13 @@ export function SourcesManager({ initial }: { initial: SourceVM[] }) {
                 type="checkbox"
                 checked={s.enabled}
                 onChange={(e) => call(`/api/sources/${s.id}`, { method: "PATCH", body: JSON.stringify({ enabled: e.target.checked }) }).catch((err) => setMsg({ text: err.message, bad: true }))}
-                className="size-4 accent-accent"
+                className="size-4 accent-[var(--brand)]"
               />
               Active
             </label>
             <button
               type="button"
-              className="min-h-9 rounded-md border border-[#d5d8d1] px-3 text-xs hover:border-urgent hover:text-urgent"
+              className="min-h-9 rounded-xl border border-line px-3 text-xs hover:border-urgent hover:text-urgent"
               onClick={() => confirm(`Remove "${s.label}"? Events already found stay.`) && call(`/api/sources/${s.id}`, { method: "DELETE" }).catch((err) => setMsg({ text: err.message, bad: true }))}
             >
               Remove
@@ -101,7 +101,7 @@ export function SourcesManager({ initial }: { initial: SourceVM[] }) {
           Link (page, RSS or iCal)
           <input type="url" value={url} onChange={(e) => setUrl(e.target.value)} required placeholder="https://…" className={input} />
         </label>
-        <button type="submit" disabled={busy} className="min-h-11 rounded-md bg-accent px-4 text-sm font-semibold text-white hover:bg-accent-ink disabled:opacity-60">
+        <button type="submit" disabled={busy} className="min-h-11 rounded-xl bg-brand px-4 text-sm font-semibold text-white hover:bg-brand-ink disabled:opacity-60">
           {busy ? "Adding…" : "Add source"}
         </button>
       </form>

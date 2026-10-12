@@ -81,7 +81,7 @@ async function Status() {
           {sources.rows
             .filter((r) => r.errors.length)
             .map((r) => (
-              <details key={r.source_name} className="rounded-md border border-line bg-surface px-4 py-3 text-sm">
+              <details key={r.source_name} className="rounded-[22px] bg-surface shadow-[var(--shadow-soft)] px-4 py-3 text-sm">
                 <summary className="cursor-pointer font-medium">
                   {r.source_name}: {r.errors.length} issue(s) in latest run
                 </summary>

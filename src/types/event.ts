@@ -42,6 +42,14 @@ export const CandidateEventSchema = z
     statedDeadline: z.date().nullable().default(null),
     registrationOpen: z.boolean().nullable().default(null),
     priceText: optText(80),
+    imageUrl: z
+      .string()
+      .trim()
+      .url()
+      .refine((u) => /^https:\/\//i.test(u), "image must be https")
+      .nullish()
+      .catch(null)
+      .transform((v) => v ?? null),
   })
   .refine((e) => !e.endAt || e.endAt >= e.startAt, { message: "endAt before startAt", path: ["endAt"] });
 

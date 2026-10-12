@@ -1,6 +1,6 @@
 import type { CandidateEventInput } from "@/types/event";
 import { canonicalCity } from "../cities";
-import { extractLdEvents, ldFormat, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
+import { extractLdEvents, ldFormat, ldImage, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
 import { type Connector, errMsg, fetchText } from "./types";
 
 /**
@@ -49,6 +49,7 @@ export const meetup: Connector = {
               statedDeadline: null,
               registrationOpen: null,
               priceText: ldPrice(ev),
+              imageUrl: ldImage(ev),
             });
           }
         } catch (e) {

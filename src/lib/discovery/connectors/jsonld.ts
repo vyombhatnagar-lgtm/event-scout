@@ -13,6 +13,7 @@ export interface LdEvent {
   location?: LdPlace | LdPlace[];
   organizer?: { name?: string } | { name?: string }[];
   offers?: LdOffer | LdOffer[];
+  image?: string | string[] | { url?: string };
 }
 
 interface LdOffer {
@@ -89,6 +90,12 @@ export function ldPrice(ev: LdEvent): string | null {
   const p = Number(o.price);
   if (p === 0) return "Free";
   return `${o.priceCurrency ?? ""} ${o.price}`.trim();
+}
+
+/** First absolute https image URL on an LD event, else null. */
+export function ldImage(ev: LdEvent): string | null {
+  const raw = Array.isArray(ev.image) ? ev.image[0] : typeof ev.image === "object" ? ev.image?.url : ev.image;
+  return raw && /^https:\/\//i.test(raw) ? raw : null;
 }
 
 export function stripQuery(url: string): string {

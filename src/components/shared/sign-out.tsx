@@ -7,7 +7,7 @@ export function SignOutButton() {
   return (
     <button
       type="button"
-      className="min-h-9 self-start text-left text-[#c9cdc5] underline hover:text-white"
+      className="min-h-10 rounded-full px-3 text-sm text-muted hover:text-ink"
       onClick={async () => {
         await fetch("/api/auth/login", { method: "DELETE" });
         router.replace("/login");

@@ -6,9 +6,9 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
+    <main className="flex min-h-screen items-center justify-center bg-ground px-4">
       <form
-        className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-line bg-surface p-7"
+        className="flex w-full max-w-sm flex-col gap-4 rounded-[22px] bg-surface shadow-[var(--shadow-soft)] p-7"
         onSubmit={async (e) => {
           e.preventDefault();
           setBusy(true);
@@ -25,19 +25,19 @@ export default function LoginPage() {
         }}
       >
         <div>
-          <h1 className="text-2xl font-semibold">Event Scout</h1>
+          <h1 className="font-serif text-[38px] leading-none">Event Scout</h1>
           <p className="mt-1 text-sm text-muted">Find the right rooms. Never miss the opportunity.</p>
         </div>
         <label className="flex flex-col gap-1.5 text-[13px] font-medium">
           Password
-          <input name="password" type="password" required autoComplete="current-password" className="min-h-11 rounded-md border border-[#c9cdc5] px-3 text-sm" />
+          <input name="password" type="password" required autoComplete="current-password" className="min-h-11 rounded-xl border border-line px-3 text-sm" />
         </label>
         {error && (
           <p role="alert" className="text-sm text-urgent">
             {error}
           </p>
         )}
-        <button type="submit" disabled={busy} className="min-h-11 rounded-md bg-accent text-sm font-semibold text-white hover:bg-accent-ink disabled:opacity-60">
+        <button type="submit" disabled={busy} className="min-h-11 rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand-ink disabled:opacity-60">
           {busy ? "Signing in…" : "Sign in"}
         </button>
       </form>

@@ -1,7 +1,7 @@
 import type { CandidateEventInput } from "@/types/event";
 import { zonedMidnight } from "@/lib/time";
 import { canonicalCity } from "../cities";
-import { type LdEvent, extractLdEvents, isDateOnly, ldFormat, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
+import { type LdEvent, extractLdEvents, isDateOnly, ldFormat, ldImage, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
 import { type Connector, errMsg, fetchText, sleep } from "./types";
 
 /**
@@ -69,6 +69,7 @@ export const eventbrite: Connector = {
                 statedDeadline: null, // listing data does not state a registration deadline
                 registrationOpen: null,
                 priceText: ldPrice(ev),
+                imageUrl: ldImage(ev),
               });
             }
           } catch (e) {

@@ -23,6 +23,7 @@ export const pipelineStatus = pgEnum("pipeline_status", [
   "registered",
   "attended",
   "follow_up_complete",
+  "dismissed",
 ]);
 export const aiStatus = pgEnum("ai_status", ["pending", "done", "failed"]);
 export const deadlineOrigin = pgEnum("deadline_origin", ["source", "ai_extracted"]);
@@ -83,6 +84,8 @@ export const events = pgTable(
     deadlineConflict: boolean("deadline_conflict").notNull().default(false),
     registrationOpen: boolean("registration_open"),
     priceText: text("price_text"),
+    /** Cover image published by the source (Luma, Eventbrite, AllEvents…), shown on cards. */
+    imageUrl: text("image_url"),
     summary: text("summary"),
     dedupeKey: text("dedupe_key").notNull(),
     aiStatus: aiStatus("ai_status").notNull().default("pending"),

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const input = "min-h-11 rounded-md border border-[#c9cdc5] bg-surface px-3 text-sm";
+const input = "min-h-11 rounded-xl border border-line bg-surface px-3 text-sm";
 
 /** Add one event from a link and/or pasted text (LinkedIn post, email, newsletter). */
 export function CaptureForm() {
@@ -13,7 +13,7 @@ export function CaptureForm() {
 
   return (
     <form
-      className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-6"
+      className="flex flex-col gap-4 rounded-[22px] bg-surface shadow-[var(--shadow-soft)] p-6"
       onSubmit={async (e) => {
         e.preventDefault();
         const f = new FormData(e.currentTarget);
@@ -39,7 +39,7 @@ export function CaptureForm() {
       </label>
       <label className="flex flex-col gap-1.5 text-[13px] font-medium">
         Announcement text <span className="font-normal text-muted">(required for LinkedIn and other sign-in sites — copy the post and paste it here)</span>
-        <textarea name="text" rows={8} className="rounded-md border border-[#c9cdc5] p-3 text-sm" placeholder="Paste the post or email text…" />
+        <textarea name="text" rows={8} className="rounded-xl border border-line p-3 text-sm" placeholder="Paste the post or email text…" />
       </label>
       <p className="text-xs text-muted">
         Gemini Flash reads the announcement; an event is added only if its name and date appear in the text. A registration deadline is added only if the text states one. The event is saved to your pipeline.
@@ -49,7 +49,7 @@ export function CaptureForm() {
           {error}
         </p>
       )}
-      <button type="submit" disabled={busy} className="min-h-11 self-start rounded-md bg-accent px-5 text-sm font-semibold text-white hover:bg-accent-ink disabled:opacity-60">
+      <button type="submit" disabled={busy} className="min-h-11 self-start rounded-xl bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-ink disabled:opacity-60">
         {busy ? "Reading the announcement…" : "Add event"}
       </button>
     </form>

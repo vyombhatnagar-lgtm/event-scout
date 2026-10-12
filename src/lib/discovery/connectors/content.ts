@@ -2,7 +2,7 @@ import type { CandidateEventInput } from "@/types/event";
 import { zonedMidnight } from "@/lib/time";
 import { canonicalCity, knownCity } from "../cities";
 import { cleanText } from "../normalise";
-import { type LdEvent, isDateOnly, ldFormat, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
+import { type LdEvent, isDateOnly, ldFormat, ldImage, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
 
 export type ContentKind = "ical" | "feed" | "html";
 
@@ -136,5 +136,6 @@ export function ldToCandidate(ev: LdEvent, sourceName: string, pageUrl: string):
     statedDeadline: null,
     registrationOpen: null,
     priceText: ldPrice(ev),
+    imageUrl: ldImage(ev),
   };
 }

@@ -19,10 +19,10 @@ export default function ChecklistPage() {
 }
 
 const GROUPS = [
-  { kind: "register", title: "Register" },
-  { kind: "review", title: "Decide" },
-  { kind: "prepare", title: "Prepare" },
-  { kind: "follow_up", title: "Follow up" },
+  { kind: "register", title: "Register", color: "#C2410C" },
+  { kind: "review", title: "Decide", color: "#2A4A8A" },
+  { kind: "prepare", title: "Prepare", color: "#1F5F4A" },
+  { kind: "follow_up", title: "Follow up", color: "#5B3E96" },
 ] as const;
 
 async function Checklist() {
@@ -36,9 +36,19 @@ async function Checklist() {
       <>
         <PageHeader
           eyebrow={`Week of ${formatDate(new Date(`${weekStart(new Date())}T12:00:00Z`), { day: "numeric", month: "short" })}`}
-          title="Weekly action checklist"
-          sub={`${done} of ${tasks.length} done. Tasks come only from real events, deadlines and your pipeline. Progress is saved.`}
+          title="This week's actions"
+          sub="Built only from real events, deadlines and your choices. Ticks are saved."
         />
+        {tasks.length > 0 && (
+          <div className="flex items-center gap-4">
+            <div className="h-3 flex-1 overflow-hidden rounded-full bg-line-2" role="progressbar" aria-valuemin={0} aria-valuemax={tasks.length} aria-valuenow={done} aria-label="Actions done">
+              <div className="h-full rounded-full bg-gradient-to-r from-[#1F5F4A] to-[#3F9A6E] transition-all" style={{ width: `${Math.round((done / tasks.length) * 100)}%` }} />
+            </div>
+            <span className="text-sm font-medium text-ink-2">
+              {done} of {tasks.length} done
+            </span>
+          </div>
+        )}
         {tasks.length === 0 ? (
           <EmptyState title="Nothing to do yet">Save events or run discovery — tasks appear for registrations, decisions, preparation and follow-ups.</EmptyState>
         ) : (
@@ -46,9 +56,13 @@ async function Checklist() {
             const list = tasks.filter((t) => t.kind === g.kind);
             if (list.length === 0) return null;
             return (
-              <Card key={g.kind} className="px-5 py-3">
-                <h2 className="pt-1 text-[15px] font-semibold">{g.title}</h2>
-                <ul className="divide-y divide-line-2">
+              <Card key={g.kind} className="px-5 py-4">
+                <h2 className="flex items-center gap-2.5 text-base font-semibold">
+                  <span className="size-2.5 rounded-full" style={{ background: g.color }} aria-hidden="true" />
+                  {g.title}
+                  <span className="text-sm font-normal text-faint">{list.filter((t) => !t.done).length} open</span>
+                </h2>
+                <ul className="mt-1">
                   {list.map((t) => (
                     <TaskItem key={t.id} task={t} />
                   ))}

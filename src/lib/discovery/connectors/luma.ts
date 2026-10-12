@@ -24,6 +24,7 @@ interface LumaEntry {
     end_at?: string;
     timezone?: string;
     url?: string;
+    cover_url?: string;
     location_type?: string;
     visibility?: string;
     geo_address_info?: { city?: string; country_code?: string; address?: string; full_address?: string };
@@ -162,6 +163,7 @@ export const luma: Connector = {
               ? false
               : null,
         priceText: priceText(e),
+        imageUrl: ev.cover_url && /^https:\/\//.test(ev.cover_url) ? ev.cover_url : null,
       };
     });
     return { candidates, errors };
