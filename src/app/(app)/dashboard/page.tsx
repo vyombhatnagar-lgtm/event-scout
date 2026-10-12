@@ -7,6 +7,7 @@ import { daysLeft, placeLabel } from "@/components/events/event-card";
 import { renderOrError } from "@/components/shared/load";
 import { CountdownRing, Notice, PageSkeleton } from "@/components/shared/ui";
 import { type DayCell, type DeckItem, TodayDeck } from "@/components/today/today-deck";
+import { WeekGlance } from "@/components/today/week-glance";
 import { toCalendarEvent } from "@/lib/calendar/from-event";
 import { googleCalendarUrl } from "@/lib/calendar/ics";
 import { syncWeeklyTasks } from "@/lib/services/checklist";
@@ -237,6 +238,8 @@ async function Today() {
             </p>
           </aside>
         </div>
+
+        <WeekGlance now={now} events={[...events, ...pipeline.filter((p) => !events.some((e) => e.id === p.id))]} minScore={prefs.minScore} />
       </>
     );
   });

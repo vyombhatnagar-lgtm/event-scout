@@ -158,7 +158,12 @@ export function TodayDeck({ items, days }: { items: DeckItem[]; days: DayCell[] 
         <h2 className="text-lg font-semibold">
           Worth a look <span className="font-normal text-faint">· {pool.length} to decide</span>
         </h2>
-        <span className="hidden text-[13px] text-faint sm:inline">{day ? "Tap the day again to see all" : "← not for me · ↓ save · → register"}</span>
+        <span className="flex items-center gap-3 text-[13px] text-faint">
+          <span className="hidden md:inline">{day ? "Tap the day again to see all" : "← not for me · ↓ save · → register"}</span>
+          <a href="#week" className="rounded-full bg-surface px-3 py-1.5 font-medium text-ink no-underline shadow-[0_1px_2px_rgb(0_0_0/0.05)] hover:text-ink">
+            Week view ↓
+          </a>
+        </span>
       </div>
 
       {error && (
