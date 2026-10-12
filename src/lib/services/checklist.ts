@@ -36,3 +36,12 @@ export async function setTaskDone(userId: string, taskId: string, done: boolean)
     .returning({ id: schema.checklistTasks.id });
   return rows.length > 0;
 }
+
+/** Last week's checklist (for the "From last week" tab). */
+export async function listTasksForWeek(userId: string, week: string) {
+  return db()
+    .select()
+    .from(schema.checklistTasks)
+    .where(and(eq(schema.checklistTasks.userId, userId), eq(schema.checklistTasks.weekStart, week)))
+    .orderBy(asc(schema.checklistTasks.createdAt));
+}

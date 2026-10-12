@@ -2,18 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { TaskItem } from "@/components/checklist/task-item";
 import { daysLeft, placeLabel } from "@/components/events/event-card";
 import { renderOrError } from "@/components/shared/load";
 import { CountdownRing, Notice, PageSkeleton } from "@/components/shared/ui";
 import { type DayCell, type DeckItem, TodayDeck } from "@/components/today/today-deck";
 import { WeekGlance } from "@/components/today/week-glance";
+import { WeekTabs } from "@/components/today/week-tabs";
+import { carryOver } from "@/lib/checklist/carry-over";
 import { toCalendarEvent } from "@/lib/calendar/from-event";
 import { googleCalendarUrl } from "@/lib/calendar/ics";
-import { syncWeeklyTasks } from "@/lib/services/checklist";
+import { listTasksForWeek, syncWeeklyTasks } from "@/lib/services/checklist";
 import { type EventView, latestSourceRuns, listPipelineEvents, listWindowEvents } from "@/lib/services/events";
 import { getPreferences, getUser } from "@/lib/services/user";
-import { DAY_MS, formatDate, formatEventWhen, localDate } from "@/lib/time";
+import { DAY_MS, formatDate, formatEventWhen, localDate, previousWeekStart, weekStart } from "@/lib/time";
 import { categoryLabel, hueFor } from "@/lib/ui/colors";
 
 export const metadata: Metadata = { title: "Today" };
@@ -71,12 +72,14 @@ async function Today() {
     const now = new Date();
     const user = await getUser();
     const prefs = await getPreferences(user.id);
-    const [events, pipeline, tasks, runs] = await Promise.all([
+    const [events, pipeline, tasks, runs, lastWeekTasks] = await Promise.all([
       listWindowEvents(user.id, now),
       listPipelineEvents(user.id, now),
       syncWeeklyTasks(user.id, prefs, now),
       latestSourceRuns(),
+      listTasksForWeek(user.id, previousWeekStart(now)),
     ]);
+    const carry = carryOver(lastWeekTasks, tasks, pipeline, weekStart(now), now);
 
     const live = events.filter((e) => e.status !== "dismissed");
     const relevant = live.filter((e) => e.score != null && e.score >= prefs.minScore && e.deadlineState.kind !== "closed");
@@ -90,7 +93,6 @@ async function Today() {
       .filter((e) => e.deadlineState.kind === "urgent" && ((e.score ?? 0) >= prefs.minScore || ["saved", "to_register"].includes(e.status)))
       .sort((a, b) => a.deadline!.getTime() - b.deadline!.getTime());
     const going = pipeline.filter((e) => e.status === "registered" && e.startAt > now);
-    const openTasks = tasks.filter((t) => !t.done);
 
     // Two-week strip with a coloured dot per relevant event (strong fits in the category's deep colour).
     const today = localDate(now);
@@ -208,28 +210,19 @@ async function Today() {
               )}
             </section>
 
-            <section aria-labelledby="week-h" className="rounded-[22px] bg-surface p-5 shadow-[var(--shadow-soft)]">
-              <div className="mb-1 flex items-baseline justify-between">
-                <h2 id="week-h" className="text-base font-semibold">
-                  This week
-                </h2>
-                <span className="text-[12.5px] text-faint">
-                  {tasks.length - openTasks.length}/{tasks.length} done
-                </span>
-              </div>
-              {tasks.length === 0 ? (
-                <p className="pt-1 text-sm text-muted">Actions appear as you save and register for events.</p>
-              ) : (
-                <ul className="flex flex-col">
-                  {tasks.slice(0, 5).map((t) => (
-                    <TaskItem key={t.id} task={t} />
-                  ))}
-                </ul>
-              )}
-              <Link href="/checklist" className="text-sm">
-                See all actions
-              </Link>
-            </section>
+            <WeekTabs
+              thisWeek={tasks}
+              lastWeek={carry.tasks}
+              carried={carry.events.map(({ event: e, reason }) => ({
+                id: e.id,
+                title: e.title,
+                when: formatEventWhen(e.startAt, e.allDay),
+                reason,
+                deadline: e.deadline && e.deadlineState.kind !== "closed" ? `Registration closes ${formatDate(e.deadline, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false })}` : null,
+                urgent: e.deadlineState.kind === "urgent",
+                color: hueFor(e.categories, e.title).ink,
+              }))}
+            />
 
             <p className="flex items-center gap-2 px-1.5 text-[13px] text-muted">
               <span className={`size-2 rounded-full ${failing.length ? "bg-urgent" : "bg-ok"}`} aria-hidden="true" />

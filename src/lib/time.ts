@@ -44,6 +44,12 @@ export function weekStart(now: Date): string {
   return new Date(Date.UTC(y, m - 1, d - back)).toISOString().slice(0, 10);
 }
 
+/** Monday (YYYY-MM-DD) of the week before the one containing `now`. */
+export function previousWeekStart(now: Date): string {
+  const [y, m, d] = weekStart(now).split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d - 7)).toISOString().slice(0, 10);
+}
+
 /** [now, now + 30 days) — the window the dashboard and digest cover. */
 export function discoveryWindow(now: Date) {
   return { from: now, to: new Date(now.getTime() + DISCOVERY_WINDOW_DAYS * DAY_MS) };

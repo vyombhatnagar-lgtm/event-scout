@@ -150,7 +150,7 @@ Plain-English brief, two-week day strip (tap to filter), one-at-a-time decision 
 `discovered → saved → to_register → registered → attended → follow_up_complete`, set manually (skips allowed). Registration status is never changed automatically.
 
 ### C9 · Weekly Checklist
-Generated only from real data: register (urgent or "to register"), decide (top new matches), prepare (registered, within 7 days), follow up (attended). Unique per week/kind/event; done-state persists.
+Generated only from real data: register (urgent or "to register"), decide (top new matches), prepare (registered, within 7 days), follow up (attended). Unique per week/kind/event; done-state persists. A **"From last week"** tab on Today carries over last week's unticked actions that still matter, events saved / half-registered before this week that are still open, and follow-ups not yet done (`src/lib/checklist/carry-over.ts`, 5 tests).
 
 ### C10 · Weekly Digest — **Mandatory**
 Next 30 days; urgent deadlines first, then top 12 by fit; dates, locations, reasons, deadline with origin, registration + source links, open checklist items, dashboard link. HTML + plain text. Preview at `/digest`.
@@ -218,7 +218,7 @@ Change from the original plan: **Neon replaces Supabase**, provisioned through t
 
 ## 7. Testing evidence
 
-`npm test` (unit, 62 tests) and `npm run test:live` (live network, 7 tests). Production checks run against https://event-scout-five.vercel.app on 12 Oct 2026.
+`npm test` (unit, 67 tests) and `npm run test:live` (live network, 7 tests). Production checks run against https://event-scout-five.vercel.app on 12 Oct 2026.
 
 | Area | Test | Result |
 |---|---|---|

@@ -21,7 +21,7 @@ Vikram, an independent management consultant, wins 40% of new business at in-per
 | AI (Gemini Flash only) | Classification, summaries, explicit-deadline extraction, event extraction from pages/posts and relevance scoring — every AI claim checked against the source text |
 | Deadlines | Real ticket-sales-end dates from Eventbrite and Luma, or stated in the text — never inferred from the event date; under 7 days flagged everywhere |
 | Calendar | One click to Google Calendar, or an .ics (Outlook/Apple) with a "registration closes" reminder — no sign-in |
-| My events | Colour-coded lanes: Going · To register · Saved · After the event; weekly action checklist |
+| My events | Colour-coded lanes: Going · To register · Saved · After the event; weekly action checklist with a **From last week** tab for anything still pending |
 | Monday briefing | Executive-memo email via Resend every Monday 06:30 IST (08:00 retry), sent once per week (idempotent) |
 | Preferences | Categories, cities, topics, formats, minimum fit, recipient, Calendly link — stored in the database |
 | Status | Source health, job history, configuration check |

@@ -42,6 +42,8 @@ export interface EventView {
   ruleScore: number | null;
   reason: string | null;
   status: PipelineStatus;
+  /** When Vikram last changed the status (null = never touched). */
+  statusUpdatedAt: Date | null;
   sources: SourceRef[];
   lastVerifiedAt: Date;
 }
@@ -104,6 +106,7 @@ function toView(r: Row, sources: SourceRef[], now: Date): EventView {
     ruleScore: r.s?.ruleScore ?? null,
     reason: r.s?.reason ?? null,
     status: r.sv?.status ?? "discovered",
+    statusUpdatedAt: r.sv?.updatedAt ?? null,
     sources,
     lastVerifiedAt: e.lastVerifiedAt,
   };
