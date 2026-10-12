@@ -9,7 +9,7 @@ import type { z } from "zod";
  * models, comma-separated, in order of preference: when one hits its quota (the free
  * tier allows ~20 requests/day per model) the next is used. Non-Flash ids are rejected.
  */
-export const DEFAULT_GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.6-flash"];
+export const DEFAULT_GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash"];
 
 export function geminiModels(): string[] {
   const raw = process.env.GEMINI_MODEL?.trim();

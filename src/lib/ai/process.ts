@@ -10,7 +10,7 @@ import { extractDeadlines } from "./deadlines";
 import { AiError } from "./gemini";
 import { assessRelevance } from "./ranking";
 
-const CLASSIFY_BATCH = 25;
+const CLASSIFY_BATCH = 15;
 const RANK_BATCH = 30;
 
 const chunk = <T,>(xs: T[], n: number) => Array.from({ length: Math.ceil(xs.length / n) }, (_, i) => xs.slice(i * n, i * n + n));
