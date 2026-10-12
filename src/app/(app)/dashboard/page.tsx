@@ -55,7 +55,7 @@ async function Dashboard() {
       <>
         <PageHeader
           eyebrow={`Week of ${formatDate(new Date(`${weekStart(now)}T12:00:00Z`), { day: "numeric", month: "short", year: "numeric" })} · next 30 days`}
-          title="Good morning, Vikram"
+          title={`${greeting(now)}, Vikram`}
           sub={
             neverRun
               ? "No discovery has run yet. Run it now to pull live events."
@@ -200,4 +200,9 @@ async function Dashboard() {
       </>
     );
   });
+}
+
+function greeting(d: Date) {
+  const h = Number(formatDate(d, { hour: "2-digit", hour12: false }));
+  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }

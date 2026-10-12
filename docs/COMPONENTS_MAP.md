@@ -6,9 +6,11 @@
 MESA School of Business · Cohort C4 · AI and its Applications — Final Project
 Problem statement: **Industry Event Scout**
 
-> **Status legend** — ✅ Implemented and tested · 🟨 Implemented, end-to-end verification pending (needs credentials/deploy) · ⬜ Planned
+**Live app:** https://event-scout-five.vercel.app · **Repository:** https://github.com/vyombhatnagar-lgtm/event-scout
+
+> **Status legend** — ✅ Implemented and verified (test or live production run) · 🟨 Implemented, partially verified · ⬜ Planned
 >
-> Last updated: 11 Oct 2026 (Phase 1–6 code complete). Nothing is ✅ unless its behaviour has been exercised by a test or a live run — see §7.
+> Last updated: 12 Oct 2026 — deployed to Vercel with Neon, Gemini Flash and Resend. Nothing is ✅ unless exercised by a test or a live run — see §7.
 
 ---
 
@@ -16,6 +18,26 @@ Problem statement: **Industry Event Scout**
 
 | # | Requirement | Type | Delivered by | Status |
 |---|---|---|---|---|
+| R1 | Live external event data (no fabricated records) | **Mandatory** | C1, C2 | ✅ 110 live events stored in production (12 Oct) |
+| R2 | Multi-source discovery | **Mandatory** | C1 — Luma, Eventbrite, Meetup | ✅ all three succeeded in production (30 / 55 / 36) |
+| R3 | Configurable categories and cities, no code change | **Mandatory** | C5 (DB-stored preferences + Settings page) | ✅ saved via the live API and persisted |
+| R4 | AI relevance ranking with **Gemini Flash** | **Mandatory** | C4 | 🟨 live Gemini Flash classification verified (25 events); full ranking limited by free-tier quota (20 req/day/model) — see §8 |
+| R5 | Events covering the next 30 days | **Mandatory** | `discoveryWindow()` | ✅ |
+| R6 | Registration deadline detection | **Mandatory** | C1 (source-stated), C4 (text extraction w/ evidence) | ✅ logic tested · live sources stated no deadlines on 12 Oct |
+| R7 | Clear warning when deadline < 7 days | **Mandatory** | C6, C7, C10 | ✅ boundary tests |
+| R8 | Clean, scannable weekly digest | **Mandatory** | C10 | ✅ delivered to inbox (12 Oct) |
+| R9 | Delivered every Monday morning (automated) | **Mandatory** | Vercel Cron → C10 → C11 | ✅ crons registered; scheduled endpoint sent once and blocked the repeat |
+| R10 | Deployed on Vercel, public URL | **Mandatory** | §6 | ✅ https://event-scout-five.vercel.app |
+| R11 | GitHub repository + Components Map | **Mandatory** | this file, README | ✅ |
+| E1 | Dashboard / command centre | Enhancement | C7 | ✅ live with real data |
+| E2 | Duplicate detection across sources | Enhancement | C3 | ✅ unit + live |
+| E3 | Event pipeline | Enhancement | C8 | 🟨 implemented; manual UI check pending |
+| E4 | Weekly action checklist | Enhancement | C9 | ✅ tasks generated from live events |
+| E5 | Google Calendar | Enhancement | C12 | ⬜ Phase 7 |
+| E6 | Calendly booking link | Enhancement | C13 | ✅ link saved in live preferences |
+| E7 | Observability / system status | Enhancement | C14 | ✅ source runs, job runs and Gemini errors visible on /status |
+
+---|---|---|---|---|
 | R1 | Live external event data (no fabricated records) | **Mandatory** | C1, C2 | ✅ connectors verified against live sources · 🟨 persistence needs `DATABASE_URL` |
 | R2 | Multi-source discovery | **Mandatory** | C1 — Luma, Eventbrite, Meetup | ✅ all three returned live events |
 | R3 | Configurable categories and cities, no code change | **Mandatory** | C5 (DB-stored preferences + Settings page) | 🟨 logic tested · persistence needs DB |
@@ -102,13 +124,13 @@ Order: (1) same source + source id, (2) same canonical URL, (3) dedupe key = nor
 **Code:** `src/lib/discovery/deduplicate.ts`, `normalise.ts`
 
 ### C4 · Gemini Flash Intelligence — **Mandatory**
-- Model: `GEMINI_MODEL` (default `gemini-3.8-flash`); startup check refuses non-Flash models. SDK: `@google/genai`, server-only.
+- Models: `GEMINI_MODEL`, a comma-separated list of Flash models (default `gemini-3.8-flash, gemini-3.6-flash, gemini-3.5-flash`). Non-Flash ids are refused. When one model is out of quota (429) or overloaded (503) the next Flash model is used. SDK: `@google/genai`, server-only.
 - Three narrow, batched tasks, each with a JSON schema (`responseJsonSchema`) **and** Zod re-validation, `temperature 0`:
   1. **Classification + summary** (`classification.ts`) — fixed category enum, audience only if stated.
   2. **Deadline extraction** (`deadlines.ts`) — only for events with no source deadline and text that plausibly contains one; result accepted only if the verbatim evidence quote is found in the source text and the date is before the event (`evidence.ts`).
   3. **Relevance** (`ranking.ts`) — 0–100 with a one-sentence reason citing event facts.
 - **Hybrid score** (`src/lib/ranking/rules.ts`): `final = 0.35 × rules + 0.65 × Gemini`; rules = location 35 + topic 35 + format 15 + timing 15. Hard mismatches (in-person outside target cities, unwanted online) are capped at 35 so AI cannot override preferences. If Gemini is unavailable the rule score is used and the event is labelled "AI pending".
-- Reliability: retries with exponential back-off (longer on 429), 45 s timeout, malformed/invalid output rejected, failures recorded on the event (`ai_status`, `ai_error`) and in `job_runs`.
+- Reliability: calls paced to 4/minute (free tier allows 5), batches of 15 (classification) / 30 (ranking), 429 never retried on the same model, 503 retried with back-off, malformed/invalid output rejected, failures recorded on the event and in `job_runs`. Events not yet assessed are labelled "Rules only · AI pending" in the UI.
 
 ### C5 · User Preferences — **Mandatory**
 Categories, cities, topics, formats, minimum fit score, digest recipient, digest on/off, Calendly link. Stored in `user_preferences`; labelled "default" until first save. Saving triggers immediate re-ranking (scores are keyed by a hash of the preference fields).
@@ -163,7 +185,7 @@ Migration: `db/migrations/0000_init.sql` (generated from `src/lib/db/schema.ts`)
 | `source_runs` | Connector run stats | idx (source, started) |
 | `job_runs` | Cron/manual job history | idx (job, started) |
 
-Change from the original plan: **Neon replaces Supabase** (your choice). Access control is enforced in the app (single owner, server-only DB credentials) instead of Supabase row-level security.
+Change from the original plan: **Neon replaces Supabase**, provisioned through the Vercel Neon integration. Access control is enforced in the app (single owner, server-only DB credentials, optional password) instead of Supabase row-level security.
 
 ---
 
@@ -190,26 +212,30 @@ Change from the original plan: **Neon replaces Supabase** (your choice). Access 
 
 ## 7. Testing evidence
 
-`npm test` (unit, 43 tests) and `npm run test:live` (live network, 5 tests).
+`npm test` (unit, 43 tests) and `npm run test:live` (live network, 5 tests). Production checks run against https://event-scout-five.vercel.app on 12 Oct 2026.
 
-| Area | Test | Status |
+| Area | Test | Result |
 |---|---|---|
-| Discovery | Luma, Eventbrite, Meetup each return real, valid events with https source URLs (11 Oct 2026: 21 / 24 / 20) | ✅ live |
-| Discovery | Unreachable source fails cleanly, no invented data | ✅ live |
+| Discovery | Luma, Eventbrite, Meetup each return real, valid events with https source URLs (local live test: 23 / 45 / 24) | ✅ |
+| Discovery | Production cron run: 110 events stored (Luma 30, Eventbrite 55, Meetup 36), 0 source errors, 76 s | ✅ |
+| Discovery | Unreachable source fails cleanly, no invented data | ✅ |
 | Discovery | Invalid records rejected (bad URL, no title, end < start) | ✅ |
-| Dedupe | Cross-site merge; same title different date/city kept apart; same id/URL merged; IST date key | ✅ |
-| Dedupe | Live combined run (41 listings → 40 events) | ✅ live |
+| Dedupe | Cross-site merge; same title on another date/city kept apart; same id/URL merged; IST date key | ✅ |
+| Dedupe | Live combined run: 92 listings → 84 events, 4 found on more than one source | ✅ |
 | Deadlines | Exactly 7 days → not urgent; 7 days − 1 s → urgent; tomorrow; < 24 h; passed; unknown; conflicting sources | ✅ |
 | Time zone | IST date, IST midnight, Monday week start across the UTC boundary | ✅ |
+| AI | Live Gemini Flash structured output validated and stored (25 events classified in production) | ✅ |
+| AI | Quota (429) and overload (503) handled: events kept pending, rule score used, errors shown on /status | ✅ |
 | AI guard | Evidence must appear in text; deadline after event rejected; pre-filter | ✅ |
-| Ranking | Relevant > irrelevant; deterministic; city change and topic change move scores; AI cannot beat hard caps | ✅ |
-| Preferences | Validation (≥1 city, Calendly-only links) | ✅ |
-| Build | `next build` (Next 16.4, Cache Components) + `tsc` + ESLint clean | ✅ |
-| AI | Live Gemini Flash structured output | 🟨 needs key |
-| DB | Migrations applied, persistence, saved events and checklist persist | 🟨 needs Neon |
-| Email | Digest delivered; second send for same week blocked | 🟨 needs Resend + DB |
-| Cron | Unauthorised request rejected; scheduled run executes | 🟨 needs deploy |
-| Deployment | Public URL loads; production integrations work | ⬜ |
+| Ranking | Relevant > irrelevant; deterministic; city and topic changes move scores; AI cannot beat hard caps | ✅ |
+| Preferences | Validation (≥1 city, Calendly-only links); saved through the live API and read back | ✅ |
+| Database | Migrations applied automatically on Vercel build; data persists in Neon | ✅ |
+| Email | Manual digest delivered via Resend; repeat in the same minute blocked | ✅ |
+| Cron | `/api/cron/*` returns 401 without `CRON_SECRET` | ✅ |
+| Cron | Scheduled digest endpoint sent this week's digest once; second call "Already sent for this week" | ✅ |
+| Cron | Three schedules registered in Vercel (discovery daily, digest Mon 08:00 + 10:00 IST) | ✅ |
+| Build | `next build` + `tsc` + ESLint clean | ✅ |
+| Deployment | Public URL loads; production integrations work | ✅ |
 
 ## 8. Known limitations
 
@@ -217,5 +243,6 @@ Change from the original plan: **Neon replaces Supabase** (your choice). Access 
 - Most listings publish **no** registration deadline (0 of 65 in the 11 Oct live run); those correctly show "Deadline unknown". Deadlines come from Luma ticket sale end dates or explicit statements in event text.
 - Luma's Discover endpoint is public but undocumented; Eventbrite/Meetup data comes from public structured data on listing pages. Any of these can change format — failures appear on `/status`.
 - Eventbrite listings give dates without times; these are shown as all-day.
-- Single-user design. Resend delivers only to the account owner's address until a domain is verified.
+- **Gemini free tier:** about 20 requests/day and 5/minute per Flash model. The app batches, paces and falls back across three Flash models, and the daily cron processes any backlog, but on a busy day some events stay "Rules only · AI pending" until the next run. Enabling billing on the Gemini key removes this limit (cost for this workload is well under $1/month).
+- Single-user design with open access (no `APP_PASSWORD` set) for examiner review. The digest recipient is locked to `DIGEST_RECIPIENT_EMAIL`, so open access cannot send email elsewhere. Resend delivers only to the account owner's address until a domain is verified.
 - Vercel Hobby cron timing is approximate within the scheduled hour.

@@ -8,8 +8,8 @@ Final examination project — MESA School of Business, Cohort C4, *AI and its Ap
 Vikram, an independent management consultant, wins 40% of new business at in-person events but loses ~45 minutes every Monday searching fragmented listings — and still misses deadlines. Event Scout pulls live events from several sources, ranks them for him with Gemini Flash, flags registration deadlines under 7 days, and emails a scannable digest every Monday at 08:00 IST.
 
 - **Architecture and requirement traceability:** [docs/COMPONENTS_MAP.md](docs/COMPONENTS_MAP.md)
-- **Live app:** _not deployed yet_
-- **Repository:** _not pushed yet_
+- **Live app:** https://event-scout-five.vercel.app (open access for review; no sign-in needed)
+- **Repository:** https://github.com/vyombhatnagar-lgtm/event-scout
 
 ## What it does
 
@@ -26,7 +26,7 @@ Vikram, an independent management consultant, wins 40% of new business at in-per
 
 ## Stack
 
-Next.js 16 (App Router, TypeScript, Cache Components) · Tailwind CSS 4 · Neon Postgres + Drizzle ORM · Gemini Flash via `@google/genai` · Resend · Vercel (hosting + cron) · Zod · Vitest.
+Next.js 16 (App Router, TypeScript, Cache Components) · Tailwind CSS 4 · Neon Postgres + Drizzle ORM · Gemini Flash via `@google/genai` (3.8 Flash, falling back to 3.6 / 3.5 Flash when a model is out of quota) · Resend · Calendly booking link · Vercel (hosting + cron) · Zod · Vitest.
 
 Why each dependency: `@neondatabase/serverless` + `drizzle-orm` (serverless Postgres over HTTP, typed queries, versioned migrations), `@google/genai` (official Gemini SDK), `resend` (email with idempotency keys), `zod` (validation of all external data, AI output and API input), `server-only` (keeps keys out of client bundles), `vitest`/`drizzle-kit`/`dotenv`/`tsx` (dev only).
 
@@ -38,8 +38,8 @@ Requirements: Node 20+ (tested on Node 24), npm.
 npm install
 ```
 
-1. Fill in `.env.local` (created for you; template in [.env.example](.env.example)): `DATABASE_URL` (Neon), `GEMINI_API_KEY`, `RESEND_API_KEY`, `DIGEST_RECIPIENT_EMAIL`, `APP_PASSWORD`. `CRON_SECRET` and `SESSION_SECRET` are pre-generated.
-2. Create the tables:
+1. Copy [.env.example](.env.example) to `.env.local` and fill in `DATABASE_URL` (Neon), `GEMINI_API_KEY`, `RESEND_API_KEY`, `DIGEST_RECIPIENT_EMAIL`, `CRON_SECRET`. `APP_PASSWORD` is optional (leave empty for open access).
+2. Create the tables (also runs automatically before every build):
 
 ```bash
 npm run db:migrate
@@ -67,10 +67,12 @@ npm run test:live
 
 ## Deploy to Vercel
 
-1. Push to GitHub and import the repo in Vercel.
-2. Add every variable from `.env.example` in Project → Settings → Environment Variables (set `APP_URL` to the production URL).
-3. Deploy. `vercel.json` registers the crons: discovery daily 06:00 IST, digest Mondays 08:00 IST (+10:00 retry). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
-4. Run `npm run db:migrate` once against the production `DATABASE_URL` (or use the same Neon database).
+1. Import the GitHub repo in Vercel.
+2. Storage → Create Database → Neon (prefix `DATABASE`) — this sets `DATABASE_URL` automatically.
+3. Add `GEMINI_API_KEY`, `RESEND_API_KEY`, `DIGEST_RECIPIENT_EMAIL`, `CRON_SECRET` (optional: `APP_PASSWORD`, `SESSION_SECRET`, `CALENDLY_URL`, `GEMINI_MODEL`) in Settings → Environment Variables.
+4. Deploy. Migrations run before the build. `vercel.json` registers the crons: discovery daily 06:00 IST, digest Mondays 08:00 IST (+10:00 retry). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
+
+The production deployment is set up exactly this way.
 
 ## Project layout
 

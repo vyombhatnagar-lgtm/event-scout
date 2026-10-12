@@ -64,9 +64,9 @@ export function EventCard({ e }: { e: EventView }) {
           ))}
           {e.status !== "discovered" && <Badge>{e.status.replace(/_/g, " ")}</Badge>}
           <DeadlineBadge e={e} />
-          {e.aiStatus !== "done" && (
-            <Badge tone="warn" title="Gemini has not processed this event yet; the score uses rules only">
-              AI pending
+          {e.score != null && e.aiScore == null && (
+            <Badge tone="warn" title="Gemini has not assessed this event yet (quota or availability); the score uses the deterministic rules only">
+              Rules only · AI pending
             </Badge>
           )}
         </div>
