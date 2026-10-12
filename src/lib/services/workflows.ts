@@ -1,6 +1,7 @@
 import "server-only";
 import { emptyAiReport, enrichPending, scoreForUser } from "@/lib/ai/process";
 import { sendDigest } from "@/lib/digest/service";
+import { enrichEventbriteDetails } from "@/lib/discovery/details";
 import { runDiscovery } from "@/lib/discovery/pipeline";
 import { syncWeeklyTasks } from "./checklist";
 import { trackJob } from "./jobs";
@@ -16,6 +17,7 @@ export function discoveryJob(trigger: "cron" | "manual") {
     const user = await getUser();
     const prefs = await getPreferences(user.id);
     const discovery = await runDiscovery(prefs.cities);
+    const details = await enrichEventbriteDetails();
     const ai = emptyAiReport();
     const budgetEnds = started + AI_BUDGET_MS;
     await enrichPending(ai, budgetEnds);
@@ -24,7 +26,7 @@ export function discoveryJob(trigger: "cron" | "manual") {
     const failedSources = discovery.sources.filter((s) => s.status === "failed").length;
     const status: "success" | "partial" | "failed" =
       failedSources === discovery.sources.length ? "failed" : failedSources > 0 || ai.errors.length > 0 || ai.stoppedEarly ? "partial" : "success";
-    return { status, detail: { discovery, ai, ms: Date.now() - started } };
+    return { status, detail: { discovery, details, ai, ms: Date.now() - started } };
   });
 }
 

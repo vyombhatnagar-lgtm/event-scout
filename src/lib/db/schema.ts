@@ -112,12 +112,31 @@ export const eventSources = pgTable(
     sourceUrl: text("source_url").notNull(),
     /** deadline as stated by this source, kept so conflicts are visible */
     statedDeadline: ts("stated_deadline"),
+    /** When the source's own event page was last read for detail (e.g. Eventbrite ticket sales end). */
+    detailCheckedAt: ts("detail_checked_at"),
     retrievedAt: ts("retrieved_at").notNull().defaultNow(),
   },
   (t) => [
     uniqueIndex("event_sources_source_uq").on(t.sourceName, t.sourceEventId),
     index("event_sources_event_idx").on(t.eventId),
   ],
+);
+
+/** User-added sources: conference sites, iSPIRT pages, newsletter RSS/Atom feeds, iCal feeds. */
+export const customSources = pgTable(
+  "custom_sources",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    label: text("label").notNull(),
+    url: text("url").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    lastCheckedAt: ts("last_checked_at"),
+    lastStatus: text("last_status"),
+    lastError: text("last_error"),
+    eventsFound: integer("events_found").notNull().default(0),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("custom_sources_url_uq").on(t.url)],
 );
 
 export const eventScores = pgTable(

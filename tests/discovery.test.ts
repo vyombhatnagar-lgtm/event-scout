@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { canonicalCity, cityMatches } from "@/lib/discovery/cities";
 import { extractLdEvents } from "@/lib/discovery/connectors/jsonld";
+import { parseEventbriteDetail } from "@/lib/discovery/connectors/eventbrite";
 import { lumaDeadline, proseToText } from "@/lib/discovery/connectors/luma";
 import { deduplicate } from "@/lib/discovery/deduplicate";
 import { cleanText, dedupeKey, normalise } from "@/lib/discovery/normalise";
@@ -105,5 +106,29 @@ describe("Luma parsing", () => {
   it("flattens ProseMirror descriptions", () => {
     const doc = { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Hello " }, { type: "text", text: "founders" }] }, { type: "paragraph", content: [{ type: "text", text: "RSVP by Oct 20." }] }] };
     expect(proseToText(doc).trim()).toBe("Hello founders\nRSVP by Oct 20.");
+  });
+});
+
+describe("Eventbrite event page", () => {
+  const page = (offers: unknown, start = "2026-10-17T10:00:00+05:30") =>
+    `<script type="application/ld+json">${JSON.stringify({ "@type": "BusinessEvent", name: "X", startDate: start, endDate: "2026-10-17T13:00:00+05:30", offers })}</script>`;
+
+  it("reads ticket-sales end as the registration deadline and the exact start time", () => {
+    const d = parseEventbriteDetail(page([{ availabilityEnds: "2026-10-16T18:30:00Z", availability: "InStock" }]));
+    expect(d?.deadline?.toISOString()).toBe("2026-10-16T18:30:00.000Z");
+    expect(d?.startAt?.toISOString()).toBe("2026-10-17T04:30:00.000Z");
+    expect(d?.soldOut).toBe(false);
+  });
+  it("uses the latest end when there are several ticket types", () => {
+    const d = parseEventbriteDetail(page([{ availabilityEnds: "2026-10-14T18:30:00Z" }, { availabilityEnds: "2026-10-16T18:30:00Z" }]));
+    expect(d?.deadline?.toISOString()).toBe("2026-10-16T18:30:00.000Z");
+  });
+  it("stays unknown if any ticket type has no end date", () => {
+    expect(parseEventbriteDetail(page([{ availabilityEnds: "2026-10-14T18:30:00Z" }, {}]))?.deadline).toBeNull();
+  });
+  it("detects sold out and ignores date-only starts", () => {
+    const d = parseEventbriteDetail(page([{ availabilityEnds: "2026-10-14T18:30:00Z", availability: "https://schema.org/SoldOut" }], "2026-10-17"));
+    expect(d?.soldOut).toBe(true);
+    expect(d?.startAt).toBeNull();
   });
 });

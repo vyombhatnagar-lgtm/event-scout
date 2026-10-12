@@ -96,7 +96,7 @@ async function persist(groups: MergedCandidate[]) {
   const urls = groups.flatMap((g) => g.sources.map((s) => s.eventUrl));
   const keys = groups.map((g) => g.key);
   const existingEvents = await d
-    .select({ id: schema.events.id, url: schema.events.eventUrl, key: schema.events.dedupeKey, description: schema.events.description })
+    .select({ id: schema.events.id, url: schema.events.eventUrl, key: schema.events.dedupeKey, description: schema.events.description, allDay: schema.events.allDay })
     .from(schema.events)
     .where(or(inArray(schema.events.eventUrl, urls), inArray(schema.events.dedupeKey, keys)));
   const byUrl = new Map(existingEvents.map((r) => [r.url, r]));
@@ -141,10 +141,18 @@ async function persist(groups: MergedCandidate[]) {
     let eventId: string;
     if (matchId) {
       const prev = byId.get(matchId);
-      const changed = prev ? (prev.description ?? "") !== (description ?? "") : false;
+      // Keep the longest description we have seen; only a genuinely new, longer text triggers AI re-processing.
+      const longer = (description?.length ?? 0) > (prev?.description?.length ?? 0);
+      // Never replace an exact time (from a detail page) with a date-only listing value.
+      const keepTimes = prev && !prev.allDay && base.allDay;
+      const { startAt, endAt, allDay, ...rest } = base;
       await d
         .update(schema.events)
-        .set({ ...base, description, ...(changed ? { aiStatus: "pending" as const } : {}) })
+        .set({
+          ...rest,
+          ...(keepTimes ? {} : { startAt, endAt, allDay }),
+          ...(longer ? { description, aiStatus: "pending" as const } : {}),
+        })
         .where(eq(schema.events.id, matchId));
       eventId = matchId;
       updated++;
@@ -171,11 +179,21 @@ async function persist(groups: MergedCandidate[]) {
         })
         .onConflictDoUpdate({
           target: [schema.eventSources.sourceName, schema.eventSources.sourceEventId],
-          set: { eventId, sourceUrl: s.sourceUrl, statedDeadline: s.statedDeadline, retrievedAt: now },
+          // Listings rarely state deadlines; keep one found earlier on the event's own page.
+          set: { eventId, sourceUrl: s.sourceUrl, statedDeadline: sql`coalesce(excluded.stated_deadline, ${schema.eventSources.statedDeadline})`, retrievedAt: now },
         });
     }
 
-    // Source-stated deadlines win over AI-extracted ones; conflicts keep the earliest and are flagged.
+    await refreshEventDeadline(eventId);
+  });
+
+  return { inserted, updated };
+}
+
+/** Source-stated deadlines win over AI-extracted ones; conflicts keep the earliest and are flagged. */
+export async function refreshEventDeadline(eventId: string) {
+  const d = db();
+  {
     const stated = await d
       .select({ source: schema.eventSources.sourceName, deadline: schema.eventSources.statedDeadline })
       .from(schema.eventSources)
@@ -193,7 +211,5 @@ async function persist(groups: MergedCandidate[]) {
         .set({ registrationDeadline: null, deadlineOrigin: null, deadlineConflict: false })
         .where(and(eq(schema.events.id, eventId), eq(schema.events.deadlineOrigin, "source")));
     }
-  });
-
-  return { inserted, updated };
+  }
 }

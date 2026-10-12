@@ -1,7 +1,7 @@
 import type { CandidateEventInput } from "@/types/event";
 import { zonedMidnight } from "@/lib/time";
 import { canonicalCity } from "../cities";
-import { extractLdEvents, isDateOnly, ldFormat, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
+import { type LdEvent, extractLdEvents, isDateOnly, ldFormat, ldOrganiser, ldPlace, ldPrice, stripQuery } from "./jsonld";
 import { type Connector, errMsg, fetchText, sleep } from "./types";
 
 /**
@@ -81,3 +81,35 @@ export const eventbrite: Connector = {
     return { candidates, errors };
   },
 };
+
+export interface EventbriteDetail {
+  /** Ticket sales end = registration deadline, only when EVERY offer states one (latest of them). */
+  deadline: Date | null;
+  startAt: Date | null;
+  endAt: Date | null;
+  description: string | null;
+  soldOut: boolean;
+}
+
+/**
+ * Parse an Eventbrite event page. The page's schema.org Event carries `offers[].availabilityEnds`
+ * (ticket sales end), which is the registration deadline stated by the source.
+ */
+export function parseEventbriteDetail(html: string): EventbriteDetail | null {
+  const ev: LdEvent | undefined = extractLdEvents(html)[0];
+  if (!ev) return null;
+  const offers = Array.isArray(ev.offers) ? ev.offers : ev.offers ? [ev.offers] : [];
+  const ends = offers.map((o) => (o.availabilityEnds ? new Date(o.availabilityEnds) : null));
+  const deadline =
+    ends.length > 0 && ends.every((d) => d && !Number.isNaN(d.getTime()))
+      ? new Date(Math.max(...ends.map((d) => d!.getTime())))
+      : null;
+  const t = (s?: string) => (s && !isDateOnly(s) && !Number.isNaN(new Date(s).getTime()) ? new Date(s) : null);
+  return {
+    deadline,
+    startAt: t(ev.startDate),
+    endAt: t(ev.endDate),
+    description: ev.description?.trim() || null,
+    soldOut: offers.length > 0 && offers.every((o) => /SoldOut/i.test(o.availability ?? "")),
+  };
+}

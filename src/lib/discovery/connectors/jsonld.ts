@@ -12,7 +12,15 @@ export interface LdEvent {
   eventStatus?: string;
   location?: LdPlace | LdPlace[];
   organizer?: { name?: string } | { name?: string }[];
-  offers?: { price?: string | number; priceCurrency?: string; url?: string } | { price?: string | number; priceCurrency?: string; url?: string }[];
+  offers?: LdOffer | LdOffer[];
+}
+
+interface LdOffer {
+  price?: string | number;
+  priceCurrency?: string;
+  url?: string;
+  availabilityEnds?: string;
+  availability?: string;
 }
 
 interface LdPlace {

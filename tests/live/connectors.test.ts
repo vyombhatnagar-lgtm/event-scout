@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { resolveCity } from "@/lib/discovery/cities";
-import { eventbrite } from "@/lib/discovery/connectors/eventbrite";
+import { eventbrite, parseEventbriteDetail } from "@/lib/discovery/connectors/eventbrite";
 import { luma } from "@/lib/discovery/connectors/luma";
 import { meetup } from "@/lib/discovery/connectors/meetup";
-import type { Connector } from "@/lib/discovery/connectors/types";
+import { type Connector, fetchText } from "@/lib/discovery/connectors/types";
 import { deduplicate } from "@/lib/discovery/deduplicate";
 import { normalise } from "@/lib/discovery/normalise";
 import { discoveryWindow } from "@/lib/time";
@@ -61,5 +61,17 @@ describe("live sources (real network)", () => {
     console.log(`\n[dedupe] ${valid.length} listings → ${groups.length} events; ${multi.length} found on more than one source`);
     multi.slice(0, 5).forEach((g) => console.log(`  = ${g.primary.title.slice(0, 60)} [${g.sources.map((s) => s.sourceName).join(", ")}]`));
     expect(groups.length).toBeLessThanOrEqual(valid.length);
+  });
+
+  it("Eventbrite event pages state a real registration deadline", async () => {
+    const { candidates } = await eventbrite.fetch({ ...ctx, cities: [ctx.cities[1]] });
+    const found = [];
+    for (const c of candidates.slice(0, 4)) {
+      const d = parseEventbriteDetail(await fetchText(c.sourceUrl));
+      console.log(`  ${c.title.slice(0, 50)} → sales end ${d?.deadline?.toISOString() ?? "unknown"}`);
+      if (d?.deadline) found.push(d);
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+    expect(found.length).toBeGreaterThan(0);
   });
 });
