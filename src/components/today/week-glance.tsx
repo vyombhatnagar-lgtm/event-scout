@@ -50,10 +50,10 @@ export function WeekGlance({ now, events, minScore, items = [] }: { now: Date; e
   };
 
   return (
-    <section id="week" aria-labelledby="week-glance-h" className="scroll-mt-6 rounded-[26px] bg-surface p-5 shadow-[var(--shadow-soft)] sm:p-6">
+    <section id="week" aria-labelledby="week-glance-h" className="scroll-mt-6 rounded-[26px] bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 id="week-glance-h" className="font-serif text-[32px] leading-none">
+          <h2 id="week-glance-h" className="font-serif text-[28px] leading-none">
             Your week at a glance
           </h2>
           <p className="mt-2 text-sm text-muted">
@@ -85,8 +85,8 @@ export function WeekGlance({ now, events, minScore, items = [] }: { now: Date; e
         </ul>
       </div>
 
-      <div className="-mx-1 mt-5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <ol className="grid min-w-[880px] grid-cols-7 gap-2.5">
+      <div className="-mx-1 mt-4 overflow-x-auto px-1 pb-2" tabIndex={0} aria-label="Week schedule, scroll sideways for more days">
+        <ol className="grid w-max grid-cols-[repeat(7,150px)] gap-2.5">
           {columns.map((c) => {
             const isToday = c.key === today;
             const weekend = [0, 6].includes(c.date.getUTCDay());

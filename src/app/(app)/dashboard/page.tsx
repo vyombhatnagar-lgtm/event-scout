@@ -147,6 +147,9 @@ async function Today() {
         <div className="flex flex-wrap items-start gap-6">
           <section aria-label="Decide" className="min-w-0 flex-[999_1_540px]">
             <TodayDeck items={deck.map(toDeckItem)} days={days} />
+            <div className="mt-6">
+              <WeekGlance now={now} events={[...events, ...pipeline.filter((p) => !events.some((e) => e.id === p.id))]} minScore={prefs.minScore} items={tasks.filter((t) => t.dueAt && (t.kind === "meeting" || t.kind === "task" || t.kind.startsWith("routine"))).map((t) => ({ id: t.id, label: t.label, kind: t.kind, dueAt: t.dueAt!, done: t.done }))} />
+            </div>
           </section>
 
           <aside className="flex min-w-0 flex-[1_1_320px] flex-col gap-5">
@@ -274,7 +277,6 @@ async function Today() {
           </aside>
         </div>
 
-        <WeekGlance now={now} events={[...events, ...pipeline.filter((p) => !events.some((e) => e.id === p.id))]} minScore={prefs.minScore} items={tasks.filter((t) => t.dueAt && (t.kind === "meeting" || t.kind === "task" || t.kind.startsWith("routine"))).map((t) => ({ id: t.id, label: t.label, kind: t.kind, dueAt: t.dueAt!, done: t.done }))} />
       </>
     );
   });
