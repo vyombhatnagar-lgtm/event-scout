@@ -7,7 +7,7 @@ Final examination project — MESA School of Business, Cohort C4, *AI and its Ap
 
 Vikram, an independent management consultant, wins 40% of new business at in-person events but loses ~45 minutes every Monday searching fragmented listings — and still misses deadlines. Event Scout pulls live events from several sources, ranks them for him with Gemini Flash, flags registration deadlines under 7 days, and emails a scannable briefing every Monday at 06:30 IST — before his week starts.
 
-- **Architecture and requirement traceability:** [docs/COMPONENTS_MAP.md](docs/COMPONENTS_MAP.md)
+- **Components Map (PDF, for submission):** [docs/Event-Scout-Components-Map.pdf](docs/Event-Scout-Components-Map.pdf) · detailed version: [docs/COMPONENTS_MAP.md](docs/COMPONENTS_MAP.md)
 - **Live app:** https://event-scout-five.vercel.app (open access for review; no sign-in needed)
 - **Repository:** https://github.com/vyombhatnagar-lgtm/event-scout
 
