@@ -10,8 +10,8 @@ import { extractDeadlines } from "./deadlines";
 import { AiError } from "./gemini";
 import { assessRelevance } from "./ranking";
 
-const CLASSIFY_BATCH = 12;
-const RANK_BATCH = 15;
+const CLASSIFY_BATCH = 25;
+const RANK_BATCH = 30;
 
 const chunk = <T,>(xs: T[], n: number) => Array.from({ length: Math.ceil(xs.length / n) }, (_, i) => xs.slice(i * n, i * n + n));
 
@@ -66,8 +66,13 @@ export async function enrichPending(report: AiReport, budgetEnds: number, now = 
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       report.errors.push(`classify: ${msg}`);
-      await db().update(schema.events).set({ aiStatus: "failed", aiError: msg.slice(0, 300) }).where(inArray(schema.events.id, batch.map((b) => b.id)));
-      report.classifyFailed += batch.length;
+      // A quota stop is not a failure of these events: leave them pending for the next run.
+      const quota = e instanceof AiError && e.kind === "rate_limit";
+      await db()
+        .update(schema.events)
+        .set({ aiStatus: quota ? "pending" : "failed", aiError: msg.slice(0, 300) })
+        .where(inArray(schema.events.id, batch.map((b) => b.id)));
+      if (!quota) report.classifyFailed += batch.length;
       if (e instanceof AiError && (e.kind === "config" || e.kind === "rate_limit")) {
         report.stoppedEarly = true;
         return;

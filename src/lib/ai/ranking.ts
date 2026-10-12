@@ -64,7 +64,7 @@ export async function assessRelevance(batch: RankInput[], prefs: Preferences): P
     topics: prefs.topics,
     target_cities: prefs.cities,
   };
-  const events = batch.map((e) => ({ ...e, description: e.description?.slice(0, 1200) ?? null }));
+  const events = batch.map((e) => ({ ...e, description: e.description?.slice(0, 600) ?? null }));
   const out = await generateStructured({
     system: SYSTEM,
     prompt: `Consultant profile:\n${JSON.stringify(profile)}\n\nEvents:\n${JSON.stringify(events)}`,

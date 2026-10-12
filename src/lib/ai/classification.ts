@@ -69,7 +69,7 @@ Return one result per input id.`;
 export async function classifyEvents(batch: ClassifyInput[]): Promise<ClassifyOutput[]> {
   if (batch.length === 0) return [];
   const prompt = JSON.stringify(
-    batch.map((e) => ({ ...e, description: e.description?.slice(0, 2500) ?? null })),
+    batch.map((e) => ({ ...e, description: e.description?.slice(0, 1500) ?? null })),
   );
   const out = await generateStructured({ system: SYSTEM, prompt: `Events:\n${prompt}`, jsonSchema: schema, validator: Output });
   const ids = new Set(batch.map((b) => b.id));
