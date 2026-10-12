@@ -4,6 +4,12 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db/client";
 import { DEFAULT_PREFERENCES, type Preferences } from "@/types/preferences";
 
+/** Booking link from CALENDLY_URL, used until one is saved in Preferences. Only calendly.com links are accepted. */
+function envCalendly(): string | null {
+  const u = process.env.CALENDLY_URL?.trim();
+  return u && /^https:\/\/(www\.)?calendly\.com\//i.test(u) ? u : null;
+}
+
 /**
  * Event Scout is a single-user tool for Vikram. The user row is created on first use
  * so a fresh database works without a manual seed step.
@@ -26,12 +32,12 @@ export async function getPreferences(userId: string): Promise<Preferences & { is
       minScore: row.minScore,
       digestEmail: row.digestEmail ?? process.env.DIGEST_RECIPIENT_EMAIL ?? null,
       digestEnabled: row.digestEnabled,
-      calendlyUrl: row.calendlyUrl,
+      calendlyUrl: row.calendlyUrl ?? envCalendly(),
       isDefault: row.isDefault,
       updatedAt: row.updatedAt,
     };
   }
-  const defaults = { ...DEFAULT_PREFERENCES, digestEmail: process.env.DIGEST_RECIPIENT_EMAIL ?? null };
+  const defaults = { ...DEFAULT_PREFERENCES, digestEmail: process.env.DIGEST_RECIPIENT_EMAIL ?? null, calendlyUrl: envCalendly() };
   await db()
     .insert(schema.userPreferences)
     .values({ userId, ...defaults, isDefault: true })
