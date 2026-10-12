@@ -1,0 +1,1 @@
+ALTER TABLE "checklist_tasks" ADD COLUMN "due_at" timestamp with time zone;

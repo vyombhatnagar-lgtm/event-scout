@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { daysLeft, placeLabel } from "@/components/events/event-card";
+import { TaskItem } from "@/components/checklist/task-item";
 import { renderOrError } from "@/components/shared/load";
 import { CountdownRing, Notice, PageSkeleton } from "@/components/shared/ui";
 import { type DayCell, type DeckItem, TodayDeck } from "@/components/today/today-deck";
@@ -149,6 +150,36 @@ async function Today() {
           </section>
 
           <aside className="flex min-w-0 flex-[1_1_320px] flex-col gap-5">
+            {carry.tasks.length + carry.events.length > 0 && (
+              <section aria-labelledby="pending-h" className="rounded-[22px] border-2 border-[#F0C9B0] bg-[#FFF8F3] p-5">
+                <div className="flex items-baseline justify-between gap-2">
+                  <h2 id="pending-h" className="text-base font-semibold text-urgent">
+                    Pending from last week
+                  </h2>
+                  <span className="text-[12.5px] text-[#9A4A20]">{carry.tasks.length + carry.events.length} carried over</span>
+                </div>
+                <p className="mt-1 text-[13px] text-muted">Finish these before moving on to this week&apos;s list.</p>
+                <ul className="mt-1 flex flex-col">
+                  {carry.tasks.slice(0, 2).map((t) => (
+                    <TaskItem key={t.id} task={t} carried />
+                  ))}
+                  {carry.tasks.length < 2 &&
+                    carry.events.slice(0, 2 - carry.tasks.length).map(({ event: e, reason }) => (
+                      <li key={e.id} className="border-t border-line-2 py-3 text-sm first:border-t-0">
+                        <Link href={`/events/${e.id}`} className="font-medium text-ink no-underline hover:underline">
+                          {e.title}
+                        </Link>
+                        <span className="block text-xs text-faint">{reason}</span>
+                      </li>
+                    ))}
+                </ul>
+                {carry.tasks.length + carry.events.length > 2 && (
+                  <Link href="/pipeline#last-week" className="text-sm">
+                    +{carry.tasks.length + carry.events.length - 2} more from last week
+                  </Link>
+                )}
+              </section>
+            )}
             <section aria-labelledby="soon-h" className="rounded-[22px] bg-surface p-5 shadow-[var(--shadow-soft)]">
               <h2 id="soon-h" className="mb-3.5 text-base font-semibold">
                 Closing soon
@@ -243,7 +274,7 @@ async function Today() {
           </aside>
         </div>
 
-        <WeekGlance now={now} events={[...events, ...pipeline.filter((p) => !events.some((e) => e.id === p.id))]} minScore={prefs.minScore} />
+        <WeekGlance now={now} events={[...events, ...pipeline.filter((p) => !events.some((e) => e.id === p.id))]} minScore={prefs.minScore} items={tasks.filter((t) => t.dueAt && (t.kind === "meeting" || t.kind === "task" || t.kind.startsWith("routine"))).map((t) => ({ id: t.id, label: t.label, kind: t.kind, dueAt: t.dueAt!, done: t.done }))} />
       </>
     );
   });

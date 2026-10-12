@@ -37,6 +37,8 @@ export function carryOver<T extends TaskLike>(
 
   const tasks = lastWeekTasks.filter((t) => {
     if (t.done || already.has(`${t.kind}:${t.eventId}`)) return false;
+    // Meetings happened (or not) on their day, and routines come back every week: neither piles up.
+    if (t.kind === "meeting" || t.kind.startsWith("routine")) return false;
     const e = t.eventId ? byId.get(t.eventId) : undefined;
     if (!e) return t.kind === "follow_up" || !t.eventId;
     if (t.kind === "follow_up") return e.status === "attended";

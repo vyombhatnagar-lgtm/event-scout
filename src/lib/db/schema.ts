@@ -193,6 +193,8 @@ export const checklistTasks = pgTable(
     kind: text("kind").notNull(),
     label: text("label").notNull(),
     detail: text("detail"),
+    /** When the task or meeting is due (manual items and weekly routines). */
+    dueAt: ts("due_at"),
     done: boolean("done").notNull().default(false),
     doneAt: ts("done_at"),
     createdAt: ts("created_at").notNull().defaultNow(),

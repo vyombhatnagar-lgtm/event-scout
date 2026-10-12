@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { AddTask } from "@/components/checklist/add-task";
 import { TaskItem } from "@/components/checklist/task-item";
 import { renderOrError } from "@/components/shared/load";
 import { Card, EmptyState, PageHeader, PageSkeleton } from "@/components/shared/ui";
@@ -19,6 +20,9 @@ export default function ChecklistPage() {
 }
 
 const GROUPS = [
+  { kind: "meeting", title: "Work meetings", color: "#2A4A8A" },
+  { kind: "task", title: "Your tasks", color: "#7A4E0F" },
+  { kind: "routine", title: "Weekly routine", color: "#5B3E96" },
   { kind: "register", title: "Register", color: "#C2410C" },
   { kind: "review", title: "Decide", color: "#2A4A8A" },
   { kind: "prepare", title: "Prepare", color: "#1F5F4A" },
@@ -49,11 +53,12 @@ async function Checklist() {
             </span>
           </div>
         )}
+        <AddTask />
         {tasks.length === 0 ? (
           <EmptyState title="Nothing to do yet">Save events or run discovery, tasks appear for registrations, decisions, preparation and follow ups.</EmptyState>
         ) : (
           GROUPS.map((g) => {
-            const list = tasks.filter((t) => t.kind === g.kind);
+            const list = tasks.filter((t) => (g.kind === "routine" ? t.kind.startsWith("routine") : t.kind === g.kind));
             if (list.length === 0) return null;
             return (
               <Card key={g.kind} className="px-5 py-4">

@@ -83,4 +83,8 @@ describe("carry-over from last week", () => {
     const r = carryOver([], [], [ev("x", { status: "dismissed" }), ev("y", { status: "registered" })], thisWeek, now);
     expect(r.events).toHaveLength(0);
   });
+  it("carries your own unfinished tasks, but not meetings or weekly routines", () => {
+    const r = carryOver([task("own", "task", null), task("m", "meeting", null), task("r", "routine_plan", null)], [], [], thisWeek, now);
+    expect(r.tasks.map((t) => t.id)).toEqual(["own"]);
+  });
 });

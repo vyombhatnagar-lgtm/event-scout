@@ -13,7 +13,15 @@ function time(e: EventView) {
  * The whole next 7 days in one view: what Vikram is going to, what's on his list,
  * the best undecided matches, and which registrations close on each day.
  */
-export function WeekGlance({ now, events, minScore }: { now: Date; events: EventView[]; minScore: number }) {
+export interface WeekItem {
+  id: string;
+  label: string;
+  kind: string;
+  dueAt: Date;
+  done: boolean;
+}
+
+export function WeekGlance({ now, events, minScore, items = [] }: { now: Date; events: EventView[]; minScore: number; items?: WeekItem[] }) {
   const days = Array.from({ length: 7 }, (_, k) => localDate(new Date(now.getTime() + k * DAY_MS)));
   const today = days[0];
   const live = events.filter((e) => e.status !== "dismissed");
@@ -30,7 +38,8 @@ export function WeekGlance({ now, events, minScore }: { now: Date; events: Event
       .sort((a, b) => a.deadline!.getTime() - b.deadline!.getTime());
     const [y, m, d] = key.split("-").map(Number);
     const date = new Date(Date.UTC(y, m - 1, d, 6));
-    return { key, date, going, listed, ideas, closing };
+    const mine = items.filter((t) => localDate(t.dueAt) === key).sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime());
+    return { key, date, going, listed, ideas, closing, mine };
   });
 
   const totals = {
@@ -66,6 +75,10 @@ export function WeekGlance({ now, events, minScore }: { now: Date; events: Event
             Worth a look
           </li>
           <li className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-full bg-[#2A4A8A]" aria-hidden="true" />
+            Meetings and tasks
+          </li>
+          <li className="flex items-center gap-1.5">
             <span className="h-0.5 w-3 rounded bg-urgent" aria-hidden="true" />
             Registration closes
           </li>
@@ -77,7 +90,7 @@ export function WeekGlance({ now, events, minScore }: { now: Date; events: Event
           {columns.map((c) => {
             const isToday = c.key === today;
             const weekend = [0, 6].includes(c.date.getUTCDay());
-            const empty = !c.going.length && !c.listed.length && !c.ideas.length && !c.closing.length;
+            const empty = !c.going.length && !c.listed.length && !c.ideas.length && !c.closing.length && !c.mine.length;
             return (
               <li key={c.key} className={`flex min-h-[220px] flex-col gap-2 rounded-[18px] p-2.5 ${isToday ? "bg-brand-soft" : weekend ? "bg-[#F1EEE7]" : "bg-[#F7F5F0]"}`}>
                 <div className="flex items-baseline justify-between px-1">
@@ -91,6 +104,19 @@ export function WeekGlance({ now, events, minScore }: { now: Date; events: Event
                     <span className="line-clamp-1 text-[#9A4A20]">{e.title}</span>
                   </Link>
                 ))}
+
+                {c.mine.map((t) => {
+                  const meeting = t.kind === "meeting";
+                  const routine = t.kind.startsWith("routine");
+                  return (
+                    <Link key={t.id} href="/checklist" className={`flex flex-col gap-0.5 rounded-xl px-2.5 py-1.5 no-underline ${t.done ? "opacity-50" : ""}`} style={{ background: meeting ? "#DCE5F7" : routine ? "#ECE6F6" : "#F6EBDA" }} title={t.label}>
+                      <span className="text-[11px] font-semibold" style={{ color: meeting ? "#2A4A8A" : routine ? "#5B3E96" : "#7A4E0F" }}>
+                        {meeting ? `Meeting ${formatDate(t.dueAt, { hour: "2-digit", minute: "2-digit", hour12: false })}` : routine ? "Weekly" : "Task"}
+                      </span>
+                      <span className={`line-clamp-2 text-[12.5px] leading-snug text-ink ${t.done ? "line-through" : ""}`}>{t.label}</span>
+                    </Link>
+                  );
+                })}
 
                 {c.going.map((e) => (
                   <Link key={e.id} href={`/events/${e.id}`} className="flex flex-col gap-0.5 rounded-xl bg-night px-2.5 py-2 text-white no-underline hover:text-white hover:opacity-90" title={e.title}>

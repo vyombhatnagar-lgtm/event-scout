@@ -54,9 +54,10 @@ export function WeekTabs({ thisWeek, lastWeek, carried, pointers, range }: { thi
               ))}
             </ul>
           )}
-          <Link href="/checklist" className="text-sm">
-            See all actions
-          </Link>
+          <div className="flex gap-4 text-sm">
+            <Link href="/checklist">See all actions</Link>
+            <Link href="/checklist#add">Add a task or meeting</Link>
+          </div>
         </div>
       ) : (
         <div role="tabpanel">
@@ -69,7 +70,7 @@ export function WeekTabs({ thisWeek, lastWeek, carried, pointers, range }: { thi
                   <p className="pt-1 text-xs font-semibold tracking-[0.06em] text-faint uppercase">Unfinished actions</p>
                   <ul className="flex flex-col">
                     {lastWeek.map((t) => (
-                      <TaskItem key={t.id} task={t} />
+                      <TaskItem key={t.id} task={t} carried />
                     ))}
                   </ul>
                 </>
