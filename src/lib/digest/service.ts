@@ -26,8 +26,8 @@ export async function buildDigest(now = new Date()): Promise<{ content: DigestCo
   const failed = runs.rows.filter((r) => r.status === "failed").map((r) => r.source_name);
   const sourceNote = `Sources checked: ${ok.join(", ") || "none yet"}${failed.length ? ` (latest run failed: ${failed.join(", ")})` : ""}.`;
   const prefsNote = `Ranked by Gemini Flash against your preferences (${prefs.topics.slice(0, 4).join(", ")}${prefs.topics.length > 4 ? "…" : ""} · ${prefs.cities.join(", ")}; minimum fit ${prefs.minScore}).`;
-  // When DIGEST_RECIPIENT_EMAIL is configured, the digest only ever goes there — so an open
-  // (password-less) deployment cannot be used to send email to arbitrary addresses.
+  // When DIGEST_RECIPIENT_EMAIL is configured, the digest only ever goes there, so an open
+  // (passwordless) deployment cannot be used to send email to arbitrary addresses.
   const recipient = process.env.DIGEST_RECIPIENT_EMAIL?.trim() || prefs.digestEmail;
   return {
     userId: user.id,
@@ -58,8 +58,8 @@ const STALE_SENDING_MS = 10 * 60_000;
 
 /**
  * Send the digest at most once per key.
- *  scheduled → key "scheduled:<user>:<week>" — the Monday cron can fire or retry any number of times
- *  manual    → key "manual:<user>:<minute>" — a double click cannot double-send
+ *  scheduled → key "scheduled:<user>:<week>", the Monday cron can fire or retry any number of times
+ *  manual    → key "manual:<user>:<minute>", a double click cannot double send
  * A failed attempt may be retried; a sent one never is.
  */
 export async function sendDigest(trigger: "scheduled" | "manual", now = new Date()): Promise<DigestOutcome> {

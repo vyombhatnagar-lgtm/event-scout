@@ -6,7 +6,7 @@ import { digestJob } from "@/lib/services/workflows";
 export const maxDuration = 300;
 
 /**
- * Vercel Cron: Monday digest. Scheduled twice (06:30 and 08:00 IST); the per-week
+ * Vercel Cron: Monday digest. Scheduled twice (06:30 and 08:00 IST); the per week
  * idempotency key means the second run only sends if the first one failed.
  */
 export async function GET(req: Request) {

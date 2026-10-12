@@ -11,7 +11,7 @@ function envCalendly(): string | null {
 }
 
 /**
- * Event Scout is a single-user tool for Vikram. The user row is created on first use
+ * Event Scout is a single user tool for Vikram. The user row is created on first use
  * so a fresh database works without a manual seed step.
  */
 export async function getUser() {

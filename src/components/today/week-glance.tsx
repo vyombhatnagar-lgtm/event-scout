@@ -48,7 +48,7 @@ export function WeekGlance({ now, events, minScore }: { now: Date; events: Event
             Your week at a glance
           </h2>
           <p className="mt-2 text-sm text-muted">
-            {formatDate(now, { day: "numeric", month: "short" })} – {formatDate(new Date(now.getTime() + 6 * DAY_MS), { day: "numeric", month: "short" })} · {totals.going} going · {totals.listed} on your list · {totals.ideas} worth a look ·{" "}
+            {formatDate(now, { day: "numeric", month: "short" })} to {formatDate(new Date(now.getTime() + 6 * DAY_MS), { day: "numeric", month: "short" })} · {totals.going} going · {totals.listed} on your list · {totals.ideas} worth a look ·{" "}
             <span className={totals.closing ? "font-medium text-urgent" : ""}>{totals.closing} closing</span>
           </p>
         </div>

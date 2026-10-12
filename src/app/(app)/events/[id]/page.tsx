@@ -104,7 +104,7 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
               <Card className="flex flex-col gap-3 p-6" >
                 {e.reason && (
                   <p className="font-serif text-[22px] leading-snug">
-                    <span className="text-faint">Why it fits — </span>
+                    <span className="text-faint">Why it fits, </span>
                     {e.reason}
                   </p>
                 )}
@@ -147,7 +147,7 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
             <Card className="flex flex-col gap-3 p-5">
               <h2 className="text-base font-semibold">Your status</h2>
               <StatusControl eventId={e.id} status={e.status} />
-              <p className="text-xs text-faint">You set this yourself — registering on the event site doesn&apos;t change it automatically.</p>
+              <p className="text-xs text-faint">You set this yourself, registering on the event site doesn&apos;t change it automatically.</p>
             </Card>
             <Card className="p-5 text-sm text-ink-2">
               <h2 className="mb-1.5 text-base font-semibold text-ink">How the score works</h2>
@@ -156,7 +156,7 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
               ) : (
                 <>
                   Fit {e.score}: your preferences (rules) {e.ruleScore}
-                  {e.aiScore != null ? `, Gemini Flash ${e.aiScore}` : " — Gemini assessment pending"}.
+                  {e.aiScore != null ? `, Gemini Flash ${e.aiScore}` : ", Gemini assessment pending"}.
                 </>
               )}
             </Card>

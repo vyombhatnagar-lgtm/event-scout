@@ -3,7 +3,7 @@ import { dedupeKey } from "./normalise";
 
 export interface MergedCandidate {
   key: string;
-  /** Best record: the one with the most populated fields, preferring timed over date-only. */
+  /** Best record: the one with the most populated fields, preferring timed over date only. */
   primary: CandidateEvent;
   /** Every source reference that described this event (kept, never discarded). */
   sources: CandidateEvent[];
@@ -15,7 +15,7 @@ const completeness = (e: CandidateEvent) =>
   (e.format !== "unknown" ? 1 : 0);
 
 /**
- * Within-batch duplicate detection, in order of confidence:
+ * Within batch duplicate detection, in order of confidence:
  *  1. same source + source ID      → same listing seen twice
  *  2. same canonical event URL     → same page
  *  3. same dedupe key (title + date + city) → same event on different sites

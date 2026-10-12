@@ -22,7 +22,7 @@ export interface CarryOver<T extends TaskLike> {
  *  - unticked actions from last week's checklist, unless the event has passed, its registration
  *    closed, or the same action was carried into this week's list already;
  *  - events saved / marked "to register" before this week that are still upcoming and open;
- *  - events attended before this week that still need a follow-up.
+ *  - events attended before this week that still need a follow up.
  */
 export function carryOver<T extends TaskLike>(
   lastWeekTasks: T[],
@@ -49,9 +49,9 @@ export function carryOver<T extends TaskLike>(
     .filter((e) => e.statusUpdatedAt && e.statusUpdatedAt < weekBegins && !taskEvents.has(e.id))
     .flatMap((e) => {
       if ((e.status === "saved" || e.status === "to_register") && e.startAt > now && e.deadlineState.kind !== "closed") {
-        return [{ event: e, reason: e.status === "to_register" ? "You started registering — not finished" : "Saved — still undecided" }];
+        return [{ event: e, reason: e.status === "to_register" ? "You started registering, not finished" : "Saved, still undecided" }];
       }
-      if (e.status === "attended") return [{ event: e, reason: "Attended — follow-up not done yet" }];
+      if (e.status === "attended") return [{ event: e, reason: "Attended, follow up not done yet" }];
       return [];
     })
     .sort((a, b) => a.event.startAt.getTime() - b.event.startAt.getTime());

@@ -4,14 +4,14 @@ import { extractLdEvents, ldFormat, ldImage, ldOrganiser, ldPlace, ldPrice, stri
 import { type Connector, errMsg, fetchText } from "./types";
 
 /**
- * Meetup's public "find" pages publish schema.org Event data (JSON-LD).
+ * Meetup's public "find" pages publish schema.org Event data (JSON LD).
  * Category 405 is Meetup's "Career & Business" category.
  */
 const CATEGORY_IDS = ["405"];
 
 export const meetup: Connector = {
   name: "Meetup",
-  method: "schema.org JSON-LD on public city event-search pages",
+  method: "schema.org JSON LD on public city event-search pages",
   async fetch({ cities, windowEnd }) {
     const candidates: CandidateEventInput[] = [];
     const errors: string[] = [];

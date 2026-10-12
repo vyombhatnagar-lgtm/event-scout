@@ -12,11 +12,11 @@ export interface RankableEvent {
 }
 
 export interface RuleBreakdown {
-  location: number; // 0–25
-  format: number; // 0–10
-  topic: number; // 0–60
-  timing: number; // 0–5
-  total: number; // 0–100
+  location: number; // 0 to 25
+  format: number; // 0 to 10
+  topic: number; // 0 to 60
+  timing: number; // 0 to 5
+  total: number; // 0 to 100
   matchedTopics: string[];
   inTargetCity: boolean;
 }

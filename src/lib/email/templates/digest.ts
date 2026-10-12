@@ -3,8 +3,8 @@ import type { EventView } from "@/lib/services/events";
 import { formatDate, formatEventWhen } from "@/lib/time";
 
 /**
- * Monday briefing — an executive-memo layout: serif headlines, numbered sections, thin rules.
- * Table-based markup and inline styles so it renders in Gmail, Outlook and Apple Mail.
+ * Monday briefing, an executive memo layout: serif headlines, numbered sections, thin rules.
+ * Table based markup and inline styles so it renders in Gmail, Outlook and Apple Mail.
  */
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const SERIF = "'Instrument Serif',Georgia,'Times New Roman',serif";
@@ -16,7 +16,7 @@ const place = (e: EventView) => (e.format === "online" ? "Online" : [e.city, e.f
 const deadlineText = (e: EventView) => {
   if (!e.deadline) return "Deadline not stated";
   const d = formatDate(e.deadline, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
-  return `Closes ${d} IST${e.deadlineOrigin === "ai_extracted" ? " (from event text)" : ""}${e.deadlineConflict ? " — sources disagree, earliest shown" : ""}`;
+  return `Closes ${d} IST${e.deadlineOrigin === "ai_extracted" ? " (from event text)" : ""}${e.deadlineConflict ? ", sources disagree, earliest shown" : ""}`;
 };
 const leftLabel = (e: EventView) => {
   const s = e.deadlineState;
@@ -27,7 +27,7 @@ const leftLabel = (e: EventView) => {
 export function digestSubject(c: DigestContent) {
   const u = c.urgent.length;
   const lead = u ? `${u} registration${u === 1 ? "" : "s"} close this week` : `${c.totalRelevant} rooms worth your time`;
-  return `Your week in rooms · ${lead} — ${formatDate(new Date(`${c.weekStart}T12:00:00Z`), { day: "numeric", month: "short" })}`;
+  return `Your week in rooms · ${lead}, ${formatDate(new Date(`${c.weekStart}T12:00:00Z`), { day: "numeric", month: "short" })}`;
 }
 
 function links(e: EventView, c: DigestContent) {
@@ -55,7 +55,7 @@ ${e.reason || e.summary ? `<div style="font-family:${SANS};font-size:14.5px;line
 function rankedRow(e: EventView, c: DigestContent) {
   return `<tr><td style="padding:15px 0;border-bottom:1px solid #ECEAE5">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-<td width="72" valign="top" style="font-family:${SERIF};font-size:24px;color:${NAVY};line-height:1">${e.score ?? "–"}<div style="font-family:${SANS};font-size:11px;color:#8A8E95;margin-top:5px">fit</div></td>
+<td width="72" valign="top" style="font-family:${SERIF};font-size:24px;color:${NAVY};line-height:1">${e.score ?? " to "}<div style="font-family:${SANS};font-size:11px;color:#8A8E95;margin-top:5px">fit</div></td>
 <td valign="top">
 <div style="font-family:${SANS};font-size:15.5px;font-weight:600;color:#0B1630">${esc(e.title)}</div>
 <div style="font-family:${SANS};font-size:13px;color:#6B6F76;margin:4px 0 6px">${esc(formatEventWhen(e.startAt, e.allDay))} · ${esc(place(e))} · ${esc(deadlineText(e))}</div>
@@ -73,8 +73,8 @@ export function renderDigestHtml(c: DigestContent): string {
     ? `${c.urgent.length} registration${c.urgent.length === 1 ? "" : "s"} close before the week is out`
     : c.totalRelevant
       ? `${c.totalRelevant} rooms worth your time this month`
-      : "A quiet week — nothing above your bar";
-  const tasks = c.tasks.map((t) => `<li style="margin:0 0 6px">${esc(t.label)}${t.detail ? ` <span style="color:#8A8E95">— ${esc(t.detail)}</span>` : ""}</li>`).join("");
+      : "A quiet week, nothing above your bar";
+  const tasks = c.tasks.map((t) => `<li style="margin:0 0 6px">${esc(t.label)}${t.detail ? ` <span style="color:#8A8E95">,  ${esc(t.detail)}</span>` : ""}</li>`).join("");
 
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600&family=Instrument+Serif&display=swap" rel="stylesheet"></head>
 <body style="margin:0;background:#F3F2EE">
@@ -117,7 +117,7 @@ export function renderDigestText(c: DigestContent): string {
       .filter(Boolean)
       .join("\n");
   return [
-    `EVENT SCOUT — WEEKLY BRIEFING · week of ${c.weekStart}`,
+    `EVENT SCOUT, WEEKLY BRIEFING · week of ${c.weekStart}`,
     `${c.totalRelevant} relevant events in the next 30 days · ${c.urgent.length} close within 7 days`,
     "",
     c.urgent.length ? "01 · DECIDE THIS WEEK" : null,
@@ -127,7 +127,7 @@ export function renderDigestText(c: DigestContent): string {
     ...(c.ranked.length ? c.ranked.map(line) : ["Nothing new met your minimum fit this week."]),
     "",
     c.tasks.length ? "THIS WEEK" : null,
-    ...c.tasks.map((t) => `[ ] ${t.label}${t.detail ? ` — ${t.detail}` : ""}`),
+    ...c.tasks.map((t) => `[ ] ${t.label}${t.detail ? `, ${t.detail}` : ""}`),
     "",
     `Open today's view: ${c.dashboardUrl}`,
     c.calendlyUrl ? `Booking link: ${c.calendlyUrl}` : null,

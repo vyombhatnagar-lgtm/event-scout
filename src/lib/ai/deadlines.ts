@@ -31,7 +31,7 @@ const schema = {
           id: { type: "string" },
           deadline: {
             type: ["string", "null"],
-            description: "ISO 8601 date-time with offset (assume +05:30 if the text gives no zone) of the stated registration/application close, else null",
+            description: "ISO 8601 date time with offset (assume +05:30 if the text gives no zone) of the stated registration/application close, else null",
           },
           evidence: { type: ["string", "null"], description: "The exact sentence from the text that states the deadline, copied verbatim; null if none" },
         },
@@ -44,7 +44,7 @@ const schema = {
 
 const SYSTEM = `You extract REGISTRATION deadlines from event descriptions.
 Return a deadline only when the text explicitly states when registration, applications, RSVPs or ticket sales close.
-The event's own start date is NOT a registration deadline — never return it as one.
+The event's own start date is NOT a registration deadline, never return it as one.
 If the text gives a date without a time, use 23:59 that day. If there is no explicit deadline, return null for both fields.
 "evidence" must be copied verbatim from the text.`;
 

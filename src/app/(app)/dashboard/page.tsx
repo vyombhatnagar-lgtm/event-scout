@@ -8,13 +8,14 @@ import { CountdownRing, Notice, PageSkeleton } from "@/components/shared/ui";
 import { type DayCell, type DeckItem, TodayDeck } from "@/components/today/today-deck";
 import { WeekGlance } from "@/components/today/week-glance";
 import { WeekTabs } from "@/components/today/week-tabs";
-import { carryOver } from "@/lib/checklist/carry-over";
+import { recapPointers } from "@/lib/checklist/recap-pointers";
+import { lastWeekRecap } from "@/lib/services/recap";
 import { toCalendarEvent } from "@/lib/calendar/from-event";
 import { googleCalendarUrl } from "@/lib/calendar/ics";
-import { listTasksForWeek, syncWeeklyTasks } from "@/lib/services/checklist";
+import { syncWeeklyTasks } from "@/lib/services/checklist";
 import { type EventView, latestSourceRuns, listPipelineEvents, listWindowEvents } from "@/lib/services/events";
 import { getPreferences, getUser } from "@/lib/services/user";
-import { DAY_MS, formatDate, formatEventWhen, localDate, previousWeekStart, weekStart } from "@/lib/time";
+import { DAY_MS, formatDate, formatEventWhen, localDate, weekRangeLabel } from "@/lib/time";
 import { categoryLabel, hueFor } from "@/lib/ui/colors";
 
 export const metadata: Metadata = { title: "Today" };
@@ -34,7 +35,7 @@ function greeting(d: Date) {
 
 function deadlineCopy(e: EventView): { title: string; sub: string } {
   const s = e.deadlineState;
-  if (s.kind === "unknown") return { title: "Deadline unknown", sub: "Not stated by the organiser — register early to be safe" };
+  if (s.kind === "unknown") return { title: "Deadline unknown", sub: "Not stated by the organiser, register early to be safe" };
   const when = formatDate(e.deadline!, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
   const origin = e.deadlineOrigin === "ai_extracted" ? " (from the event text)" : "";
   if (s.kind === "closed") return { title: "Registration closed", sub: `Closed ${when} IST` };
@@ -72,18 +73,18 @@ async function Today() {
     const now = new Date();
     const user = await getUser();
     const prefs = await getPreferences(user.id);
-    const [events, pipeline, tasks, runs, lastWeekTasks] = await Promise.all([
+    const [events, pipeline, tasks, runs] = await Promise.all([
       listWindowEvents(user.id, now),
       listPipelineEvents(user.id, now),
       syncWeeklyTasks(user.id, prefs, now),
       latestSourceRuns(),
-      listTasksForWeek(user.id, previousWeekStart(now)),
     ]);
-    const carry = carryOver(lastWeekTasks, tasks, pipeline, weekStart(now), now);
+    const recap = await lastWeekRecap(user.id, pipeline, tasks, now);
+    const carry = recap.carry;
 
     const live = events.filter((e) => e.status !== "dismissed");
     const relevant = live.filter((e) => e.score != null && e.score >= prefs.minScore && e.deadlineState.kind !== "closed");
-    // Deck: undecided relevant events, best fit first — with a boost when registration closes within a week.
+    // Deck: undecided relevant events, best fit first, with a boost when registration closes within a week.
     const priority = (e: EventView) => (e.score ?? 0) + (e.deadlineState.kind === "urgent" ? 12 : 0);
     const deck = relevant
       .filter((e) => e.status === "discovered")
@@ -94,7 +95,7 @@ async function Today() {
       .sort((a, b) => a.deadline!.getTime() - b.deadline!.getTime());
     const going = pipeline.filter((e) => e.status === "registered" && e.startAt > now);
 
-    // Two-week strip with a coloured dot per relevant event (strong fits in the category's deep colour).
+    // Two week strip with a coloured dot per relevant event (strong fits in the category's deep colour).
     const today = localDate(now);
     const dows = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const days: DayCell[] = Array.from({ length: 14 }, (_, k) => {
@@ -112,7 +113,7 @@ async function Today() {
 
     const brief =
       relevant.length === 0
-        ? "Nothing new above your bar today — enjoy the quiet."
+        ? "Nothing new above your bar today, enjoy the quiet."
         : `${relevant.length} rooms are worth your time this month${closing.length ? `, and ${closing.length} close${closing.length === 1 ? "s" : ""} within a week` : ""}.`;
 
     const lastRun = runs.rows.map((r) => r.finished_at).filter(Boolean).sort().at(-1);
@@ -130,7 +131,7 @@ async function Today() {
         {prefs.isDefault && (
           <Notice>
             <span>
-              You&apos;re on the starter preferences ({prefs.cities.join(", ")}). <Link href="/settings">Tune them</Link> any time — results update immediately.
+              You&apos;re on the starter preferences ({prefs.cities.join(", ")}). <Link href="/settings">Tune them</Link> any time, results update immediately.
             </span>
           </Notice>
         )}
@@ -205,7 +206,7 @@ async function Today() {
               )}
               {prefs.calendlyUrl && (
                 <a href={prefs.calendlyUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-[13.5px] text-[#CFE6DA] hover:text-white">
-                  Book follow-ups on Calendly →
+                  Book follow ups on Calendly →
                 </a>
               )}
             </section>
@@ -222,6 +223,16 @@ async function Today() {
                 urgent: e.deadlineState.kind === "urgent",
                 color: hueFor(e.categories, e.title).ink,
               }))}
+              range={weekRangeLabel(recap.from, recap.to)}
+              pointers={recapPointers({
+                openActions: carry.tasks.length,
+                halfRegistered: carry.events.filter((c) => c.event.status === "to_register").length,
+                savedUndecided: carry.events.filter((c) => c.event.status === "saved").length,
+                followUps: recap.followUps.length,
+                happened: recap.happened.filter((e) => e.status === "registered").length,
+                briefingSentAt: recap.briefingSentAt ? formatDate(recap.briefingSentAt, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false }) : null,
+                newSinceMonday: recap.newSinceMonday,
+              })}
             />
 
             <p className="flex items-center gap-2 px-1.5 text-[13px] text-muted">

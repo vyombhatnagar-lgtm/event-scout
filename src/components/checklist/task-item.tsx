@@ -52,7 +52,7 @@ export function TaskItem({ task }: { task: TaskVM }) {
         </span>
         {error && (
           <span role="alert" className="text-xs text-urgent">
-            Could not save — try again.
+            Could not save, try again.
           </span>
         )}
       </div>

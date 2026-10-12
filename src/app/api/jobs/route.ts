@@ -7,7 +7,7 @@ export const maxDuration = 300;
 
 const Body = z.object({ job: z.enum(["discovery", "scoring", "digest"]) });
 
-/** Manual triggers from the dashboard (signed-in owner only — enforced by proxy). */
+/** Manual triggers from the dashboard (signed in owner only, enforced by proxy). */
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return badRequest("Unknown job");

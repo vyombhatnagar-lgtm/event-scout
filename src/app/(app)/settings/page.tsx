@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Preferences" };
 export default function SettingsPage() {
   return (
     <>
-      <PageHeader title="Preferences" sub="Stored in the database. Changes apply to ranking immediately and to the next discovery run — no redeploy." />
+      <PageHeader title="Preferences" sub="Stored in the database. Changes apply to ranking immediately and to the next discovery run, no redeploy." />
       <Suspense fallback={<PageSkeleton />}>
         <Form />
       </Suspense>

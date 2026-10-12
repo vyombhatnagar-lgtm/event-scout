@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Event Scout — Components Map</title>
+<title>Event Scout: Components Map</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet">
 <style>
   @page { size: A4 landscape; margin: 0; }
@@ -50,12 +50,12 @@
 <section class="page">
   <header>
     <div>
-      <div class="kicker">MESA SCHOOL OF BUSINESS · COHORT C4 · AI AND ITS APPLICATIONS — FINAL PROJECT</div>
-      <h1>Event Scout — Components Map</h1>
+      <div class="kicker">MESA SCHOOL OF BUSINESS · COHORT C4 · AI AND ITS APPLICATIONS, FINAL PROJECT</div>
+      <h1>Event Scout: Components Map</h1>
     </div>
     <div class="meta">Problem statement: <b>Industry Event Scout</b><br>Live app: <b>event-scout-five.vercel.app</b><br>Repo: <b>github.com/vyombhatnagar-lgtm/event-scout</b></div>
   </header>
-  <p class="lede">Vikram, an independent consultant, wins 40% of new business in rooms with decision-makers but loses ~45 minutes every Monday hunting fragmented listings — and still misses deadlines. Event Scout pulls live events from many sources, ranks them for his focus areas with <b>Gemini Flash</b>, flags registrations closing within 7 days, and delivers a Monday 06:30 IST briefing plus a daily “Today” view.</p>
+  <p class="lede">Vikram, an independent consultant, wins 40% of new business in rooms with decision makers but loses ~45 minutes every Monday hunting fragmented listings, and still misses deadlines. Event Scout pulls live events from many sources, ranks them for his focus areas with <b>Gemini Flash</b>, flags registrations closing within 7 days, and delivers a Monday 06:30 IST briefing plus a daily “Today” view.</p>
 
   <div class="flow">
     <div class="col">
@@ -70,33 +70,33 @@
         <div class="box"><b>Web search</b>Gemini + Google</div>
         <div class="box"><b>Your sources</b>page · RSS · iCal</div>
       </div>
-      <div class="box night"><b>Add from a link</b><span>Paste a LinkedIn post or email — Gemini extracts the event, verified against the text</span></div>
+      <div class="box night"><b>Add from a link</b><span>Paste a LinkedIn post or email, Gemini extracts the event, verified against the text</span></div>
     </div>
     <div class="arrow">→</div>
     <div class="col">
       <div class="col-title">2 · DISCOVERY ENGINE</div>
-      <div class="box"><b>Connectors <span class="tag m">MANDATORY</span></b><span>One per source; a failure never blocks others; per-run stats in <i>source_runs</i></span></div>
-      <div class="box"><b>Normalise + validate</b><span>Zod schema, http(s) only, unknowns stay null — never guessed</span></div>
-      <div class="box"><b>De-duplicate</b><span>source id → URL → title + IST date + city; every source link kept</span></div>
-      <div class="box"><b>Deadline detail</b><span>Eventbrite ticket-sales end, Luma ticket end; earliest kept on conflict</span></div>
+      <div class="box"><b>Connectors <span class="tag m">MANDATORY</span></b><span>One per source; a failure never blocks others; per run stats in <i>source_runs</i></span></div>
+      <div class="box"><b>Normalise + validate</b><span>Zod schema, http(s) only, unknowns stay null, never guessed</span></div>
+      <div class="box"><b>Deduplicate</b><span>source id → URL → title + IST date + city; every source link kept</span></div>
+      <div class="box"><b>Deadline detail</b><span>Eventbrite ticket sales end, Luma ticket end; earliest kept on conflict</span></div>
       <div class="box"><b>Scheduler</b><span>Vercel Cron · 05:00 IST daily · CRON_SECRET protected</span></div>
     </div>
     <div class="arrow">→</div>
     <div class="col">
       <div class="col-title">3 · STORE + INTELLIGENCE</div>
       <div class="db"><b>Neon Postgres</b>events · event_sources · scores · pipeline · checklist · custom_sources · digest_runs · job logs<br><span style="opacity:.8">4 versioned migrations, run on every deploy</span></div>
-      <div class="box green"><b>Gemini Flash <span class="tag m">MANDATORY</span></b><span>Classify · summarise · extract deadlines & events · score fit (0–100 + reason)</span></div>
+      <div class="box green"><b>Gemini Flash <span class="tag m">MANDATORY</span></b><span>Classify · summarise · extract deadlines & events · score fit (0 to 100 + reason)</span></div>
       <div class="box"><b>Hybrid ranking</b><span>35% preference rules + 65% Gemini; hard caps for wrong city / format</span></div>
-      <div class="box"><b>Anti-invention guard</b><span>Every AI claim must quote the source text; quota stops never fail the run</span></div>
+      <div class="box"><b>Anti invention guard</b><span>Every AI claim must quote the source text; quota stops never fail the run</span></div>
     </div>
     <div class="arrow">→</div>
     <div class="col">
       <div class="col-title">4 · WHAT VIKRAM USES</div>
-      <div class="box night"><b>Today</b><span>Brief · 2-week day strip · one-at-a-time decision cards (Not for me / Save / Register) · Closing soon rings · You’re going · This week + From last week · Week at a glance</span></div>
+      <div class="box night"><b>Today</b><span>Brief · 2 week day strip · one at a time decision cards (Not for me / Save / Register) · Closing soon rings · You’re going · This week + From last week · Week at a glance</span></div>
       <div class="box blue"><b>Monday briefing <span class="tag m">MANDATORY</span></b><span>06:30 IST via Resend · urgent first · sent once per week (idempotent) · 08:00 retry</span></div>
-      <div class="box amber"><b>Explore · My events · Event page</b><span>Photo-card grid, colour-coded pipeline lanes, full detail with “why it fits”</span></div>
+      <div class="box amber"><b>Explore · My events · Event page</b><span>Photo card grid, colour coded pipeline lanes, full detail with “why it fits”</span></div>
       <div class="box violet"><b>Calendar + Calendly <span class="tag e">ENHANCEMENT</span></b><span>Google Calendar link / .ics with “registration closes” reminder · booking link</span></div>
-      <div class="box rose"><b>Settings + Status</b><span>Categories, cities, topics, min score, sources — no redeploy · source health & job log</span></div>
+      <div class="box rose"><b>Settings + Status</b><span>Categories, cities, topics, min score, sources, no redeploy · source health & job log</span></div>
     </div>
   </div>
 
@@ -106,9 +106,9 @@
     <div class="box"><b>Neon</b>Serverless Postgres</div>
     <div class="box"><b>Gemini Flash</b>3.8 → 3.6 → 3.5 fallback</div>
     <div class="box"><b>Resend</b>Email, idempotency keys</div>
-    <div class="box"><b>Tests</b>67 unit · 7 live-source</div>
+    <div class="box"><b>Tests</b>67 unit · 7 live source</div>
   </div>
-  <footer><span>All AI tasks use Gemini Flash only — no Claude API in the application.</span><span>Page 1 of 2 · 12 Oct 2026</span></footer>
+  <footer><span>All AI tasks use Gemini Flash only, no Claude API in the application.</span><span>Page 1 of 2 · 12 Oct 2026</span></footer>
 </section>
 
 <section class="page">
@@ -123,19 +123,19 @@
     <table>
       <thead><tr><th></th><th>COMPONENT</th><th>WHAT IT DOES</th><th>CODE</th></tr></thead>
       <tbody>
-        <tr><td class="n">1</td><td><b>Discovery engine</b></td><td>Eight live sources + add-from-link; per-source run stats</td><td class="code">lib/discovery/connectors</td></tr>
+        <tr><td class="n">1</td><td><b>Discovery engine</b></td><td>Eight live sources + add from link; per source run stats</td><td class="code">lib/discovery/connectors</td></tr>
         <tr><td class="n">2</td><td><b>Normalisation</b></td><td>Canonical event schema; invalid records rejected with a reason</td><td class="code">types/event.ts · normalise.ts</td></tr>
         <tr><td class="n">3</td><td><b>Duplicate detection</b></td><td>Merges the same event across sites; never on title alone</td><td class="code">discovery/deduplicate.ts</td></tr>
-        <tr><td class="n">4</td><td><b>Gemini Flash intelligence</b></td><td>Classify, summarise, extract, score — validated JSON, paced, quota-aware</td><td class="code">lib/ai/*</td></tr>
-        <tr><td class="n">5</td><td><b>Preferences</b></td><td>Categories, cities, topics, formats, min fit — stored in DB</td><td class="code">settings · api/preferences</td></tr>
+        <tr><td class="n">4</td><td><b>Gemini Flash intelligence</b></td><td>Classify, summarise, extract, score, validated JSON, paced, quota aware</td><td class="code">lib/ai/*</td></tr>
+        <tr><td class="n">5</td><td><b>Preferences</b></td><td>Categories, cities, topics, formats, min fit, stored in DB</td><td class="code">settings · api/preferences</td></tr>
         <tr><td class="n">6</td><td><b>Deadline intelligence</b></td><td>Stated deadlines only; &lt;7 days = urgent; IST; conflicts flagged</td><td class="code">lib/deadlines.ts</td></tr>
         <tr><td class="n">7</td><td><b>Today view</b></td><td>Decision cards, day strip, countdown rings, week at a glance</td><td class="code">app/(app)/dashboard</td></tr>
         <tr><td class="n">8</td><td><b>Event pipeline</b></td><td>Saved → To register → Registered → Attended → Followed up</td><td class="code">app/(app)/pipeline</td></tr>
-        <tr><td class="n">9</td><td><b>Weekly checklist</b></td><td>Actions from real events + “From last week” carry-over</td><td class="code">lib/checklist/*</td></tr>
+        <tr><td class="n">9</td><td><b>Weekly checklist</b></td><td>Actions from real events + “From last week” carry over</td><td class="code">lib/checklist/*</td></tr>
         <tr><td class="n">10</td><td><b>Monday briefing</b></td><td>Next 30 days, urgent first, links to register / calendar / source</td><td class="code">lib/digest · email/templates</td></tr>
         <tr><td class="n">11</td><td><b>Email delivery</b></td><td>Resend; one send per week guaranteed; every attempt logged</td><td class="code">lib/email/send.ts</td></tr>
-        <tr><td class="n">12</td><td><b>Calendar</b></td><td>Google Calendar link + .ics with deadline reminder, no sign-in</td><td class="code">lib/calendar/ics.ts</td></tr>
-        <tr><td class="n">13</td><td><b>Calendly</b></td><td>Booking link for follow-ups (Settings, Today, briefing)</td><td class="code">preferences.calendlyUrl</td></tr>
+        <tr><td class="n">12</td><td><b>Calendar</b></td><td>Google Calendar link + .ics with deadline reminder, no sign in</td><td class="code">lib/calendar/ics.ts</td></tr>
+        <tr><td class="n">13</td><td><b>Calendly</b></td><td>Booking link for follow ups (Settings, Today, briefing)</td><td class="code">preferences.calendlyUrl</td></tr>
         <tr><td class="n">14</td><td><b>Observability</b></td><td>Source health, job history, config check; quota ≠ failure</td><td class="code">app/(app)/status</td></tr>
       </tbody>
     </table>
@@ -148,8 +148,8 @@
         <tr><td><b>Domains & cities, no code</b></td><td>Settings page → database</td><td class="ok">✓</td></tr>
         <tr><td><b>Rank by focus areas</b></td><td>Rules + Gemini score with reason</td><td class="ok">✓</td></tr>
         <tr><td><b>Next 30 days</b></td><td>Discovery window + digest</td><td class="ok">✓</td></tr>
-        <tr><td><b>&lt;7-day deadline flag</b></td><td>9 live urgent flags; boundary tests</td><td class="ok">✓</td></tr>
-        <tr><td><b>Scannable in &lt;5 min</b></td><td>Memo-style briefing, urgent first</td><td class="ok">✓</td></tr>
+        <tr><td><b>&lt;7 day deadline flag</b></td><td>9 live urgent flags; boundary tests</td><td class="ok">✓</td></tr>
+        <tr><td><b>Scannable in &lt;5 min</b></td><td>Memo style briefing, urgent first</td><td class="ok">✓</td></tr>
         <tr><td><b>Monday morning email</b></td><td>Cron 06:30 IST; sent + duplicate blocked</td><td class="ok">✓</td></tr>
         <tr><td><b>Deployed on Vercel</b></td><td>event-scout-five.vercel.app</td><td class="ok">✓</td></tr>
         <tr><td><b>GitHub + Components Map</b></td><td>Public repo · this document</td><td class="ok">✓</td></tr>

@@ -59,13 +59,13 @@ const schema = {
   required: ["events"],
 };
 
-const SYSTEM = `You classify professional events for a management consultant's business-development tool.
+const SYSTEM = `You classify professional events for a management consultant's business development tool.
 Use ONLY the text provided for each event. Do not add facts, speakers, prices, dates or attendance figures that are not in the text.
 If the audience is not stated or clearly implied by the text, return null for audience.
 Summaries: at most two plain sentences describing what the event is. No hype, no invented detail.
 Return one result per input id.`;
 
-/** Classification + summary for a batch of events (user-independent, stored on the event). */
+/** Classification + summary for a batch of events (user independent, stored on the event). */
 export async function classifyEvents(batch: ClassifyInput[]): Promise<ClassifyOutput[]> {
   if (batch.length === 0) return [];
   const prompt = JSON.stringify(

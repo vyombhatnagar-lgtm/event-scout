@@ -23,7 +23,7 @@ export default function DigestPage() {
         <DigestInfo />
       </Suspense>
       <section aria-labelledby="prev-h" className="flex flex-col gap-3">
-        <SectionTitle id="prev-h" aside={<a href="/api/digest/preview?format=text" target="_blank" rel="noopener noreferrer">Plain-text version</a>}>
+        <SectionTitle id="prev-h" aside={<a href="/api/digest/preview?format=text" target="_blank" rel="noopener noreferrer">Plain text version</a>}>
           Preview
         </SectionTitle>
         <iframe title="Digest email preview" src="/api/digest/preview" className="h-[1400px] w-full rounded-[22px] bg-[#F3F2EE] shadow-[var(--shadow-soft)]" />
@@ -41,7 +41,7 @@ async function DigestInfo() {
       <div className="flex flex-col gap-4">
         {!prefs.digestEmail && (
           <Notice tone="urgent">
-            <span>No recipient set. Add your email in <Link href="/settings">Preferences</Link> — the digest is never sent to any other address.</span>
+            <span>No recipient set. Add your email in <Link href="/settings">Preferences</Link>, the digest is never sent to any other address.</span>
           </Notice>
         )}
         {!prefs.digestEnabled && <Notice><span>The scheduled digest is turned off in Preferences. Test sends still work.</span></Notice>}

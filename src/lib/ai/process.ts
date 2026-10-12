@@ -28,7 +28,7 @@ export interface AiReport {
 
 /**
  * Enrich events that have not been through AI yet: classification + summary, then
- * explicit-deadline extraction for events whose sources did not state one.
+ * explicit deadline extraction for events whose sources did not state one.
  */
 export async function enrichPending(report: AiReport, budgetEnds: number, now = new Date()) {
   const { to } = discoveryWindow(now);
@@ -79,7 +79,7 @@ export async function enrichPending(report: AiReport, budgetEnds: number, now = 
       }
     }
 
-    // Deadline extraction — only where no source states one.
+    // Deadline extraction, only where no source states one.
     const needDeadline = batch.filter((e) => !e.deadlineOrigin && e.description);
     if (needDeadline.length === 0) continue;
     try {

@@ -52,7 +52,7 @@ export function PreferencesForm({ initial, isDefault }: { initial: Preferences; 
     }
     setState({ kind: "ranking" });
     const job = await fetch("/api/jobs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ job: "scoring" }) }).catch(() => null);
-    setState(job?.ok ? { kind: "done", msg: "Saved. Events have been re-ranked with your new preferences." } : { kind: "done", msg: "Saved. Re-ranking will finish on the next scheduled run." });
+    setState(job?.ok ? { kind: "done", msg: "Saved. Events have been reranked with your new preferences." } : { kind: "done", msg: "Saved. Reranking will finish on the next scheduled run." });
     router.refresh();
   }
 
@@ -68,7 +68,7 @@ export function PreferencesForm({ initial, isDefault }: { initial: Preferences; 
 
         <section className="flex flex-col gap-3 rounded-[22px] bg-surface shadow-[var(--shadow-soft)] p-6">
           <h2 className="text-[17px] font-semibold">Target cities</h2>
-          <p className="text-[13px] text-muted">Discovery searches these cities. In-person events elsewhere are capped at a low score.</p>
+          <p className="text-[13px] text-muted">Discovery searches these cities. In person events elsewhere are capped at a low score.</p>
           <ChipGroup legend="Cities" options={CITY_OPTIONS} value={p.cities} onChange={(v) => set("cities", v)} />
           <div className="flex items-end gap-2">
             <label className="flex flex-1 flex-col gap-1.5 text-[13px] font-medium">
@@ -92,7 +92,7 @@ export function PreferencesForm({ initial, isDefault }: { initial: Preferences; 
         <section className="flex flex-col gap-3 rounded-[22px] bg-surface shadow-[var(--shadow-soft)] p-6">
           <h2 className="text-[17px] font-semibold">Industries and topics</h2>
           <label className="flex flex-col gap-1.5 text-[13px] font-medium">
-            Topics (comma separated) — used by the rules and by Gemini to judge fit
+            Topics (comma separated), used by the rules and by Gemini to judge fit
             <textarea rows={3} value={topicsText} onChange={(e) => setTopicsText(e.target.value)} className="rounded-xl border border-line p-3 text-sm" />
           </label>
           <fieldset className="flex flex-col gap-1">
@@ -135,7 +135,7 @@ export function PreferencesForm({ initial, isDefault }: { initial: Preferences; 
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={state.kind === "saving" || state.kind === "ranking"} className="min-h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-ink disabled:opacity-60">
-          {state.kind === "saving" ? "Saving…" : state.kind === "ranking" ? "Re-ranking events…" : "Save preferences"}
+          {state.kind === "saving" ? "Saving…" : state.kind === "ranking" ? "Reranking events…" : "Save preferences"}
         </button>
         {state.msg && (
           <p role="status" className={`text-sm ${state.kind === "error" ? "text-urgent" : "text-ok"}`}>

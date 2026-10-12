@@ -19,8 +19,8 @@ export interface DetailReport {
 
 /**
  * Eventbrite listing pages give no registration deadline and only a date. Each event's own
- * page states ticket-sales end (`offers.availabilityEnds`) and the exact start time.
- * Visit a few per run (soonest first, re-checked every 3 days), politely paced.
+ * page states ticket sales end (`offers.availabilityEnds`) and the exact start time.
+ * Visit a few per run (soonest first, rechecked every 3 days), politely paced.
  */
 export async function enrichEventbriteDetails(now = new Date()): Promise<DetailReport> {
   const report: DetailReport = { checked: 0, deadlinesFound: 0, timesFixed: 0, errors: [] };
@@ -60,7 +60,7 @@ export async function enrichEventbriteDetails(now = new Date()): Promise<DetailR
         report.timesFixed++;
       }
       if (detail.soldOut) patch.registrationOpen = false;
-      // A fuller description helps classification — but only worth it before AI has run.
+      // A fuller description helps classification, but only worth it before AI has run.
       if (detail.description && ev.aiStatus !== "done" && detail.description.length > (ev.description?.length ?? 0)) {
         patch.description = detail.description.slice(0, 8000);
       }

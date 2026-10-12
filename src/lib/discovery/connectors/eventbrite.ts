@@ -6,7 +6,7 @@ import { type Connector, errMsg, fetchText, sleep } from "./types";
 
 /**
  * Eventbrite retired its public event-search API in 2020. Its public city/category
- * listing pages publish schema.org Event data (JSON-LD) for search engines; we read
+ * listing pages publish schema.org Event data (JSON LD) for search engines; we read
  * that structured data only. Robots rules for these paths permit crawling.
  */
 const CATEGORY_PATHS = ["business--events", "science-and-tech--events"];
@@ -17,7 +17,7 @@ const TZ_BY_COUNTRY: Record<string, string> = { IN: "Asia/Kolkata", SG: "Asia/Si
 
 export const eventbrite: Connector = {
   name: "Eventbrite",
-  method: "schema.org JSON-LD on public city/category listing pages",
+  method: "schema.org JSON LD on public city/category listing pages",
   async fetch({ cities, windowEnd }) {
     const candidates: CandidateEventInput[] = [];
     const errors: string[] = [];
@@ -26,7 +26,7 @@ export const eventbrite: Connector = {
       for (const cat of CATEGORY_PATHS) {
         for (let page = 1; page <= PAGES; page++) {
           const listUrl = `https://www.eventbrite.com/d/${city.eventbrite}/${cat}/${page > 1 ? `?page=${page}` : ""}`;
-          if (requests++ > 0) await sleep(REQUEST_GAP_MS); // be a polite, low-volume client
+          if (requests++ > 0) await sleep(REQUEST_GAP_MS); // be a polite, low volume client
           try {
             const evs = extractLdEvents(await fetchText(listUrl));
             if (evs.length === 0) {

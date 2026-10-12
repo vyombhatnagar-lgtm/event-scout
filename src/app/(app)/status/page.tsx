@@ -17,11 +17,11 @@ export default function StatusPage() {
     <>
       <PageHeader
         title="System status"
-        sub="Live source health, scheduled job history and configuration. Failures are shown here — never hidden or replaced with sample data."
+        sub="Live source health, scheduled job history and configuration. Failures are shown here, never hidden or replaced with sample data."
         actions={
           <>
             <JobButton job="discovery" label="Run discovery now" />
-            <JobButton job="scoring" label="Re-rank events" />
+            <JobButton job="scoring" label="Rerank events" />
           </>
         }
       />

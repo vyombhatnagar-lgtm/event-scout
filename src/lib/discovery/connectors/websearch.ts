@@ -53,7 +53,7 @@ const schema = {
 };
 
 const SYSTEM = `You are an event researcher for an independent management consultant in India.
-Use Google Search to find real, upcoming, in-person professional events. Only include events you found on an actual web page with a clear name, date and link.
+Use Google Search to find real, upcoming, in person professional events. Only include events you found on an actual web page with a clear name, date and link.
 Never invent events, dates, links or deadlines. If unsure, leave it out.`;
 
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
@@ -86,9 +86,9 @@ export const webSearch: Connector = {
     const candidates: CandidateEventInput[] = [];
     const from = localDate(windowStart);
     const to = localDate(windowEnd);
-    const prompt = `Find up to ${MAX_RESULTS} upcoming in-person events between ${from} and ${to} in ${cities.map((c) => c.name).join(", ")} (India).
+    const prompt = `Find up to ${MAX_RESULTS} upcoming in person events between ${from} and ${to} in ${cities.map((c) => c.name).join(", ")} (India).
 Focus: ${(focus?.categories ?? []).join(", ")}. Topics: ${(focus?.topics ?? []).join(", ")}.
-Prioritise CXO/CIO/CFO roundtables, leadership summits, industry conferences and startup-ecosystem events where senior decision-makers attend — including ones announced on LinkedIn, iSPIRT, NASSCOM, TiE, CII, FICCI or organiser websites.`;
+Prioritise CXO/CIO/CFO roundtables, leadership summits, industry conferences and startup-ecosystem events where senior decision makers attend, including ones announced on LinkedIn, iSPIRT, NASSCOM, TiE, CII, FICCI or organiser websites.`;
 
     let found: z.infer<typeof Output>["events"];
     try {

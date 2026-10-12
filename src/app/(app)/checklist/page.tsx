@@ -50,7 +50,7 @@ async function Checklist() {
           </div>
         )}
         {tasks.length === 0 ? (
-          <EmptyState title="Nothing to do yet">Save events or run discovery — tasks appear for registrations, decisions, preparation and follow-ups.</EmptyState>
+          <EmptyState title="Nothing to do yet">Save events or run discovery, tasks appear for registrations, decisions, preparation and follow ups.</EmptyState>
         ) : (
           GROUPS.map((g) => {
             const list = tasks.filter((t) => t.kind === g.kind);

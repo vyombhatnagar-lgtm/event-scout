@@ -6,7 +6,7 @@ import { weekStart } from "@/lib/time";
 import type { Preferences } from "@/types/preferences";
 import { listPipelineEvents, listWindowEvents } from "./events";
 
-/** Add any newly-relevant tasks for this week; existing tasks (and their done state) are kept. */
+/** Add any newly relevant tasks for this week; existing tasks (and their done state) are kept. */
 export async function syncWeeklyTasks(userId: string, prefs: Preferences, now = new Date()) {
   const week = weekStart(now);
   const [windowEvents, pipeline] = await Promise.all([listWindowEvents(userId, now), listPipelineEvents(userId, now)]);

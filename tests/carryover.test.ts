@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { carryOver } from "@/lib/checklist/carry-over";
+import { carryOver } from "@/lib/checklist/carryover";
 import { deadlineState } from "@/lib/deadlines";
 import type { EventView } from "@/lib/services/events";
 
@@ -77,7 +77,7 @@ describe("carry-over from last week", () => {
   });
   it("reminds about follow-ups for events attended before this week", () => {
     const r = carryOver([], [], [ev("att", { status: "attended", startAt: new Date("2026-10-15T12:00:00Z") })], thisWeek, now);
-    expect(r.events[0].reason).toMatch(/follow-up/);
+    expect(r.events[0].reason).toMatch(/follow up/);
   });
   it("never lists dismissed or registered events", () => {
     const r = carryOver([], [], [ev("x", { status: "dismissed" }), ev("y", { status: "registered" })], thisWeek, now);

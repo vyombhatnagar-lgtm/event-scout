@@ -1,4 +1,4 @@
-/** Words that make an explicit deadline plausible — avoids spending AI calls on text that cannot contain one. */
+/** Words that make an explicit deadline plausible, avoids spending AI calls on text that cannot contain one. */
 export const DEADLINE_HINT =
   /\b(registers?|registrations?|rsvps?|apply|applications?|tickets?|sales?|entries)\b[^.]{0,80}\b(by|before|until|till|closes?|closing|deadline|ends?)\b|\b(deadline|last date|closes?|closing)\b[^.]{0,60}\b(register|registration|rsvp|apply|application|tickets?)/i;
 
@@ -11,7 +11,7 @@ export function verifyQuote(quote: string | null | undefined, text: string): boo
 }
 
 /**
- * Guard against hallucinated deadlines. A model-extracted deadline is accepted only if:
+ * Guard against hallucinated deadlines. A model extracted deadline is accepted only if:
  *  - it parses as a date,
  *  - its evidence quote actually appears in the source text,
  *  - it is not after the event starts (a "deadline" after the event is a misread).

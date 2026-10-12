@@ -6,7 +6,7 @@ import type { z } from "zod";
 
 /**
  * All application AI runs through Gemini Flash. GEMINI_MODEL may list several Flash
- * models, comma-separated, in order of preference: when one hits its quota (the free
+ * models, comma separated, in order of preference: when one hits its quota (the free
  * tier allows ~20 requests/day per model) the next is used. Non-Flash ids are rejected.
  */
 export const DEFAULT_GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash"];
@@ -44,7 +44,7 @@ export class AiError extends Error {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Space calls out to stay under the per-minute limit (free tier: 5 RPM → default 15 s gap = 4 RPM). */
+/** Space calls out to stay under the per minute limit (free tier: 5 RPM → default 15 s gap = 4 RPM). */
 const MIN_INTERVAL_MS = Number(process.env.GEMINI_MIN_INTERVAL_MS ?? 15_000);
 let lastCallAt = 0;
 async function pace() {
@@ -53,15 +53,15 @@ async function pace() {
   lastCallAt = Date.now();
 }
 
-/** Models that returned 429 in this server instance — skipped until the instance recycles. */
+/** Models that returned 429 in this server instance, skipped until the instance recycles. */
 const exhausted = new Set<string>();
 /** Model that served the most recent successful call (recorded in job details). */
 export let lastModelUsed: string | null = null;
 
 /**
- * One structured Gemini call: JSON-schema-constrained output, validated again with Zod.
+ * One structured Gemini call: JSON schema constrained output, validated again with Zod.
  * - 429 → never retried on the same model (that only burns quota); falls through to the next Flash model.
- * - 503 / timeout / invalid output → retried with back-off.
+ * - 503 / timeout / invalid output → retried with backoff.
  * Never returns unvalidated data.
  */
 export async function generateStructured<T>(opts: {
@@ -117,7 +117,7 @@ export async function generateStructured<T>(opts: {
           exhausted.add(model);
           break; // try the next Flash model
         }
-        // 503: this model is busy — move to another Flash model if one still has quota, else wait and retry.
+        // 503: this model is busy, move to another Flash model if one still has quota, else wait and retry.
         const others = geminiModels().filter((m) => m !== model && !exhausted.has(m));
         if (lastErr.overloaded && others.length && geminiModels().indexOf(others[0]) > geminiModels().indexOf(model)) break;
 
@@ -126,12 +126,12 @@ export async function generateStructured<T>(opts: {
     }
   }
   if (lastErr?.kind === "rate_limit" || geminiModels().every((m) => exhausted.has(m))) {
-    throw new AiError(`Gemini quota reached for ${geminiModels().join(", ")} — remaining events will be processed on the next run`, "rate_limit");
+    throw new AiError(`Gemini quota reached for ${geminiModels().join(", ")}, remaining events will be processed on the next run`, "rate_limit");
   }
   throw lastErr ?? new AiError("Gemini call failed", "api");
 }
 
-/** Pull the JSON object out of a free-text reply (strips ```json fences and surrounding prose). */
+/** Pull the JSON object out of a free text reply (strips ```json fences and surrounding prose). */
 export function jsonFromText(text: string): string {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
   const body = fenced ? fenced[1] : text;

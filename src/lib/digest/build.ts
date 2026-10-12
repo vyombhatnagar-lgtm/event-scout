@@ -18,7 +18,7 @@ export const DIGEST_MAX_EVENTS = 12;
 
 /**
  * Pick what goes in the digest:
- *  - urgent: relevant OR already-saved events whose registration closes within 7 days
+ *  - urgent: relevant OR already saved events whose registration closes within 7 days
  *  - ranked: the top relevant events in the next 30 days (≥ minScore)
  * Events whose deadline has passed are excluded from "ranked" unless a source says registration is open.
  */

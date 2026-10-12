@@ -46,14 +46,14 @@ const schema = {
   required: ["events"],
 };
 
-const SYSTEM = `You score events for business-development value to an independent management consultant who wins clients by meeting senior decision-makers in person.
-Score 0–100 for how likely attending leads to meeting potential clients that match his profile:
-- 80–100: senior business audience (founders, CXOs, investors, leaders) AND strong topic match.
-- 50–79: relevant topic or relevant audience, not both.
-- 20–49: tangential (mostly technical practitioners, students, generic networking).
-- 0–19: unrelated (consumer, entertainment, hobby, unrelated industry).
+const SYSTEM = `You score events for business development value to an independent management consultant who wins clients by meeting senior decision makers in person.
+Score 0 to 100 for how likely attending leads to meeting potential clients that match his profile:
+- 80 to 100: senior business audience (founders, CXOs, investors, leaders) AND strong topic match.
+- 50 to 79: relevant topic or relevant audience, not both.
+- 20 to 49: tangential (mostly technical practitioners, students, generic networking).
+- 0 to 19: unrelated (consumer, entertainment, hobby, unrelated industry).
 Judge ONLY from the given fields. Do not assume speakers, sponsors or attendance that are not stated.
-The reason must cite concrete facts from the event fields (topic, audience, organiser, format) — never invent any.
+The reason must cite concrete facts from the event fields (topic, audience, organiser, format), never invent any.
 Location and format preferences are applied separately by rules; focus on audience and topic fit.`;
 
 /** Gemini relevance assessment for one batch against the user's stored preferences. */

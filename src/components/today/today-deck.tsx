@@ -38,7 +38,7 @@ type Status = "dismissed" | "saved" | "to_register" | "registered";
 
 async function setStatus(id: string, status: Status) {
   const res = await fetch(`/api/events/${id}/status`, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ status }) });
-  if (!res.ok) throw new Error("Could not save your choice — check your connection and try again.");
+  if (!res.ok) throw new Error("Could not save your choice, check your connection and try again.");
 }
 
 function Ring({ daysLeft }: { daysLeft: number | null }) {
@@ -54,7 +54,7 @@ function Ring({ daysLeft }: { daysLeft: number | null }) {
 }
 
 /**
- * Today's decision stack: one event at a time — Not for me / Save / Register.
+ * Today's decision stack: one event at a time, Not for me / Save / Register.
  * Every choice is saved to the pipeline immediately. Registering opens the organiser's page;
  * the event is only marked "Registered" when Vikram confirms he completed it.
  */
@@ -190,9 +190,9 @@ export function TodayDeck({ items, days }: { items: DeckItem[]; days: DayCell[] 
               <span className="rounded-full bg-white/90 px-3 py-1 text-[12.5px] font-semibold">{card.category}</span>
               <span className="rounded-full bg-white/90 px-3 py-1 text-[12.5px]">{card.source}</span>
             </div>
-            <div className="absolute top-4 right-5 flex size-16 flex-col items-center justify-center rounded-full bg-white shadow-[0_4px_14px_rgb(0_0_0/0.1)]" title={card.rulesOnly ? "Scored by rules — Gemini assessment pending" : "Fit with your focus areas"}>
+            <div className="absolute top-4 right-5 flex size-16 flex-col items-center justify-center rounded-full bg-white shadow-[0_4px_14px_rgb(0_0_0/0.1)]" title={card.rulesOnly ? "Scored by rules, Gemini assessment pending" : "Fit with your focus areas"}>
               <span className="text-xl leading-none font-bold" style={{ color: card.hue.ink }}>
-                {card.fit ?? "–"}
+                {card.fit ?? " to "}
               </span>
               <span className="text-[10px] tracking-[0.08em] text-faint">FIT</span>
             </div>
@@ -238,7 +238,7 @@ export function TodayDeck({ items, days }: { items: DeckItem[]; days: DayCell[] 
                     Yes, I&apos;m registered
                   </button>
                   <button type="button" onClick={() => finishConfirm(false)} className="min-h-11 rounded-xl border border-line bg-surface px-4 text-sm font-medium">
-                    Not yet — keep it on my list
+                    Not yet, keep it on my list
                   </button>
                   <a href={card.gcalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-medium text-ink no-underline">
                     Add to Google Calendar
@@ -291,7 +291,7 @@ export function TodayDeck({ items, days }: { items: DeckItem[]; days: DayCell[] 
               <span className="h-1.5 w-7 rounded-full" style={{ background: u.hue.shape }} />
               <span className="line-clamp-2 text-sm leading-snug font-semibold">{u.title}</span>
               <span className="text-[12.5px] text-faint">
-                {u.when.split(" · ")[0]} · fit {u.fit ?? "–"}
+                {u.when.split(" · ")[0]} · fit {u.fit ?? " to "}
               </span>
             </Link>
           ))}

@@ -10,7 +10,7 @@ export const STATUS_LABELS: Record<PipelineStatus, string> = {
   to_register: "To register",
   registered: "Registered",
   attended: "Attended",
-  follow_up_complete: "Follow-up complete",
+  follow_up_complete: "Follow up complete",
   dismissed: "Not for me",
 };
 

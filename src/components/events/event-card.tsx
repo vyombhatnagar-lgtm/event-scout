@@ -28,7 +28,7 @@ export function DeadlineText({ e }: { e: EventView }) {
 export function DeadlineBadge({ e }: { e: EventView }) {
   const s = e.deadlineState;
   if (s.kind === "urgent") return <Badge tone="urgent">{s.label}</Badge>;
-  if (s.kind === "closed") return <Badge tone="neutral">{e.registrationOpen ? "Deadline passed — source shows open" : "Registration closed"}</Badge>;
+  if (s.kind === "closed") return <Badge tone="neutral">{e.registrationOpen ? "Deadline passed, source shows open" : "Registration closed"}</Badge>;
   return null;
 }
 

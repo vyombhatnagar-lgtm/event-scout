@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { TaskItem, type TaskVM } from "@/components/checklist/task-item";
+import type { Pointer } from "@/lib/checklist/recap-pointers";
+import { RecapList } from "./recap-list";
 
 export interface CarriedEventVM {
   id: string;
@@ -15,7 +17,7 @@ export interface CarriedEventVM {
 }
 
 /** "This week" checklist and a "From last week" tab for anything still pending. */
-export function WeekTabs({ thisWeek, lastWeek, carried }: { thisWeek: TaskVM[]; lastWeek: TaskVM[]; carried: CarriedEventVM[] }) {
+export function WeekTabs({ thisWeek, lastWeek, carried, pointers, range }: { thisWeek: TaskVM[]; lastWeek: TaskVM[]; carried: CarriedEventVM[]; pointers: Pointer[]; range: string }) {
   const pending = lastWeek.length + carried.length;
   const [tab, setTab] = useState<"now" | "last">("now");
   const done = thisWeek.filter((t) => t.done).length;
@@ -58,9 +60,9 @@ export function WeekTabs({ thisWeek, lastWeek, carried }: { thisWeek: TaskVM[]; 
         </div>
       ) : (
         <div role="tabpanel">
-          {pending === 0 ? (
-            <p className="py-2 text-sm text-muted">Nothing left over from last week — you&apos;re all square.</p>
-          ) : (
+          <p className="pt-1 pb-1.5 text-xs font-semibold tracking-[0.06em] text-faint uppercase">Last week · {range}</p>
+          <RecapList pointers={pointers} />
+          {pending > 0 && (
             <>
               {lastWeek.length > 0 && (
                 <>
@@ -95,6 +97,9 @@ export function WeekTabs({ thisWeek, lastWeek, carried }: { thisWeek: TaskVM[]; 
               )}
             </>
           )}
+          <Link href="/pipeline#last-week" className="mt-2 inline-block text-sm">
+            Open last week in My events
+          </Link>
         </div>
       )}
     </section>

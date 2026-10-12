@@ -59,7 +59,7 @@ export function parseIcalDate(value: string, params: string): { date: Date; allD
 
 const icalUnescape = (s: string) => s.replace(/\\n/gi, "\n").replace(/\\([,;\\])/g, "$1");
 
-/** Deterministic iCal parsing — no AI needed. */
+/** Deterministic iCal parsing, no AI needed. */
 export function parseIcal(body: string, sourceName: string, feedUrl: string): CandidateEventInput[] {
   const lines = body.replace(/\r?\n[ \t]/g, "").split(/\r?\n/);
   const out: CandidateEventInput[] = [];

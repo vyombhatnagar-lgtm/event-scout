@@ -12,7 +12,7 @@ const short = (d: Date) => formatDate(d, { weekday: "short", day: "numeric", mon
 
 /**
  * Derive this week's actions from real events and pipeline state only.
- * No event, no task — nothing is generated just to fill the list.
+ * No event, no task, nothing is generated just to fill the list.
  */
 export function draftWeeklyTasks(
   windowEvents: EventView[],
@@ -31,11 +31,11 @@ export function draftWeeklyTasks(
       if (ds.kind === "urgent") {
         tasks.push({ eventId: e.id, kind: "register", label: `Register: ${e.title}`, detail: `${ds.label} (${short(e.deadline!)})` });
       } else if (e.status === "to_register" && ds.kind !== "closed") {
-        tasks.push({ eventId: e.id, kind: "register", label: `Register: ${e.title}`, detail: ds.kind === "unknown" ? "Deadline unknown — check the event page" : ds.label });
+        tasks.push({ eventId: e.id, kind: "register", label: `Register: ${e.title}`, detail: ds.kind === "unknown" ? "Deadline unknown, check the event page" : ds.label });
       }
     }
     if (e.status === "registered" && startsIn > 0 && startsIn <= 7 * DAY_MS) {
-      tasks.push({ eventId: e.id, kind: "prepare", label: `Prepare for ${e.title}`, detail: `Event ${short(e.startAt)} — review attendees and plan who to meet` });
+      tasks.push({ eventId: e.id, kind: "prepare", label: `Prepare for ${e.title}`, detail: `Event ${short(e.startAt)}, review attendees and plan who to meet` });
     }
     if (e.status === "attended") {
       tasks.push({

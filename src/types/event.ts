@@ -19,7 +19,7 @@ const optText = (max: number) =>
 
 /**
  * What a connector hands to the pipeline. Validated before anything is stored.
- * Unknown values are null — never guessed.
+ * Unknown values are null, never guessed.
  */
 export const CandidateEventSchema = z
   .object({

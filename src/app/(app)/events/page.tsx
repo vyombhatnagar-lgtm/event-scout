@@ -127,7 +127,7 @@ async function EventGrid({ searchParams }: { searchParams: Promise<SP> }) {
             {all.length ? (
               <Link href="/events">Clear filters</Link>
             ) : (
-              "New events arrive every morning at 05:00 — or add one from a link."
+              "New events arrive every morning at 05:00, or add one from a link."
             )}
           </EmptyState>
         )}

@@ -38,7 +38,7 @@ export function SourcesManager({ initial }: { initial: SourceVM[] }) {
           Sources
         </h2>
         <p className="mt-1 text-[13px] text-muted">
-          Built in: Luma, Eventbrite, Meetup and Gemini web search. Add conference sites, iSPIRT pages, newsletter RSS feeds or iCal feeds below — they are checked daily.
+          Built in: Luma, Eventbrite, Meetup and Gemini web search. Add conference sites, iSPIRT pages, newsletter RSS feeds or iCal feeds below, they are checked daily.
         </p>
       </div>
       <ul className="flex flex-col divide-y divide-line-2 rounded-xl border border-line">
@@ -52,7 +52,7 @@ export function SourcesManager({ initial }: { initial: SourceVM[] }) {
                 {s.url}
               </a>
               <span className="text-xs text-muted">
-                {s.lastCheckedAt ? `Last checked ${new Date(s.lastCheckedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })} · ${s.eventsFound} upcoming event${s.eventsFound === 1 ? "" : "s"}` : "Not checked yet — runs with the next discovery"}
+                {s.lastCheckedAt ? `Last checked ${new Date(s.lastCheckedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })} · ${s.eventsFound} upcoming event${s.eventsFound === 1 ? "" : "s"}` : "Not checked yet, runs with the next discovery"}
                 {s.lastError ? ` · ${s.lastError}` : ""}
               </span>
             </span>

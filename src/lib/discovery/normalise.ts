@@ -3,7 +3,7 @@ import { localDate } from "@/lib/time";
 
 const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", apos: "'", nbsp: " " };
 
-/** Decode common HTML entities and strip tags — sources sometimes embed markup in text fields. */
+/** Decode common HTML entities and strip tags, sources sometimes embed markup in text fields. */
 export function cleanText(s: string | null | undefined): string | null {
   if (s == null) return null;
   const out = s
@@ -52,8 +52,8 @@ export function normaliseTitle(title: string): string {
 }
 
 /**
- * Cross-source identity for an event: normalised title + local start DATE + city
- * (or "online"). Title similarity alone never merges two events — a matching
+ * Cross source identity for an event: normalised title + local start DATE + city
+ * (or "online"). Title similarity alone never merges two events, a matching
  * title on a different day or in a different city yields a different key.
  */
 export function dedupeKey(e: Pick<CandidateEvent, "title" | "startAt" | "city" | "format">): string {

@@ -1,5 +1,5 @@
 /**
- * Time-zone policy: every instant is stored in UTC (timestamptz). Everything the user
+ * Time zone policy: every instant is stored in UTC (timestamptz). Everything the user
  * sees, and every "this week" / "next 30 days" boundary, is computed in APP_TIMEZONE.
  */
 export const APP_TIMEZONE = "Asia/Kolkata";
@@ -50,7 +50,7 @@ export function previousWeekStart(now: Date): string {
   return new Date(Date.UTC(y, m - 1, d - 7)).toISOString().slice(0, 10);
 }
 
-/** [now, now + 30 days) — the window the dashboard and digest cover. */
+/** [now, now + 30 days), the window the dashboard and digest cover. */
 export function discoveryWindow(now: Date) {
   return { from: now, to: new Date(now.getTime() + DISCOVERY_WINDOW_DAYS * DAY_MS) };
 }
@@ -66,3 +66,12 @@ export function formatEventWhen(start: Date, allDay: boolean) {
 }
 
 export { DAY_MS };
+
+/** "5 to 11 Oct" for a Monday and Sunday given as YYYY-MM-DD (IST). */
+export function weekRangeLabel(from: string, to: string) {
+  const f = (ymd: string, month: boolean) => {
+    const [y, m, d] = ymd.split("-").map(Number);
+    return formatDate(new Date(Date.UTC(y, m - 1, d, 6)), month ? { day: "numeric", month: "short" } : { day: "numeric" });
+  };
+  return `${f(from, false)} to ${f(to, true)}`;
+}

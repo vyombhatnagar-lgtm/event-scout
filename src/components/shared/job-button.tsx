@@ -23,12 +23,12 @@ function describe(job: Job, status: string, detail: Record<string, unknown>): st
   }
   if (job === "scoring") {
     const ai = detail.ai as { scored: number; scoredRulesOnly: number; errors: string[] } | undefined;
-    if (ai) return `Re-ranked: ${ai.scored} with Gemini, ${ai.scoredRulesOnly} with rules only${ai.errors.length ? ` · ${ai.errors[0]}` : ""}`;
+    if (ai) return `Reranked: ${ai.scored} with Gemini, ${ai.scoredRulesOnly} with rules only${ai.errors.length ? ` · ${ai.errors[0]}` : ""}`;
   }
   return `Finished: ${status}`;
 }
 
-/** Runs a server job and reports the real outcome — never a fake success. */
+/** Runs a server job and reports the real outcome, never a fake success. */
 export function JobButton({ job, label, variant = "secondary" }: { job: Job; label: string; variant?: "primary" | "secondary" }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -50,7 +50,7 @@ export function JobButton({ job, label, variant = "secondary" }: { job: Job; lab
             else setMsg({ text: describe(job, body.status, body.detail ?? {}), bad: body.status === "failed" });
             router.refresh();
           } catch {
-            setMsg({ text: "Network error — the job may still be running. Check System status.", bad: true });
+            setMsg({ text: "Network error, the job may still be running. Check System status.", bad: true });
           } finally {
             setBusy(false);
           }

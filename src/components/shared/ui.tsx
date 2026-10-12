@@ -55,7 +55,7 @@ export function ScoreRing({ score, size = 60 }: { score: number | null; size?: n
       aria-label={score == null ? "Not yet scored" : `Fit score ${score} out of 100`}
     >
       <span className={`leading-none font-bold ${score == null ? "text-faint" : "text-brand"}`} style={{ fontSize: size * 0.32 }}>
-        {score ?? "–"}
+        {score ?? " to "}
       </span>
       <span className="text-[10px] tracking-[0.08em] text-faint">FIT</span>
     </div>

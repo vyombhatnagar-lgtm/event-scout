@@ -38,7 +38,7 @@ export function CaptureForm() {
         <input name="url" type="url" required placeholder="https://www.linkedin.com/posts/… or any event page" className={input} />
       </label>
       <label className="flex flex-col gap-1.5 text-[13px] font-medium">
-        Announcement text <span className="font-normal text-muted">(required for LinkedIn and other sign-in sites — copy the post and paste it here)</span>
+        Announcement text <span className="font-normal text-muted">(required for LinkedIn and other sign in sites, copy the post and paste it here)</span>
         <textarea name="text" rows={8} className="rounded-xl border border-line p-3 text-sm" placeholder="Paste the post or email text…" />
       </label>
       <p className="text-xs text-muted">

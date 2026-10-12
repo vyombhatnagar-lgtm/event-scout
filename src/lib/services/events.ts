@@ -126,7 +126,7 @@ export async function listWindowEvents(userId: string, now = new Date()): Promis
   return rows.map((r) => toView(r, sources.get(r.e.id) ?? [], now));
 }
 
-/** Events in the user's pipeline (any status beyond "discovered"), including past ones for follow-up. */
+/** Events in the user's pipeline (any status beyond "discovered"), including past ones for follow up. */
 export async function listPipelineEvents(userId: string, now = new Date()): Promise<EventView[]> {
   const rows = await db()
     .select({ e: schema.events, s: schema.eventScores, sv: schema.savedEvents })

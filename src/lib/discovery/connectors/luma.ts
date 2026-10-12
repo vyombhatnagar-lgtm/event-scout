@@ -58,8 +58,8 @@ export function proseToText(node: unknown): string {
 }
 
 /**
- * Registration deadline as stated by Luma: the latest end-of-sale across visible
- * ticket types — but only if EVERY visible type states one. Otherwise unknown.
+ * Registration deadline as stated by Luma: the latest end of sale across visible
+ * ticket types, but only if EVERY visible type states one. Otherwise unknown.
  */
 export function lumaDeadline(detail: LumaDetail | null): Date | null {
   const types = (detail?.ticket_types ?? []).filter((t) => !t.is_hidden && !t.is_disabled);
@@ -121,7 +121,7 @@ export const luma: Connector = {
     });
     const unique = [...new Map(inWindow.map((e) => [e.event.api_id, e])).values()];
 
-    // Detail adds the description (needed for AI) and ticket end-of-sale (the real deadline).
+    // Detail adds the description (needed for AI) and ticket end of sale (the real deadline).
     const details = await mapLimit(unique.slice(0, MAX_DETAIL_FETCHES), 4, async (e) => {
       try {
         return await fetchJson<LumaDetail>(`${API}/event/get?event_api_id=${encodeURIComponent(e.event.api_id)}`);

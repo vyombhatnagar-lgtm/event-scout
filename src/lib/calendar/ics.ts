@@ -19,7 +19,7 @@ const DAY = 86_400_000;
 const pad = (n: number) => String(n).padStart(2, "0");
 const utcStamp = (d: Date) =>
   `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
-/** Calendar date in IST for all-day events (sources give only a date). */
+/** Calendar date in IST for all day events (sources give only a date). */
 const istDate = (d: Date) => new Date(d.getTime() + 330 * 60_000).toISOString().slice(0, 10).replace(/-/g, "");
 
 export function icsEscape(s: string): string {
@@ -107,7 +107,7 @@ export function buildIcs(e: CalendarEvent, now = new Date()): string {
   return lines.filter((l): l is string => l !== null).map(icsFold).join("\r\n") + "\r\n";
 }
 
-/** Google Calendar "create event" link — opens a pre-filled event for the signed-in Google user. */
+/** Google Calendar "create event" link, opens a pre-filled event for the signed in Google user. */
 export function googleCalendarUrl(e: CalendarEvent): string {
   const t = eventTimes(e);
   const strip = (s: string) => s.replace(/^;VALUE=DATE:|^:/, "");

@@ -1,29 +1,29 @@
 # Event Scout
 
-**AI-powered event intelligence for business development.**
+**AI powered event intelligence for business development.**
 *Find the right rooms. Never miss the opportunity.*
 
-Final examination project — MESA School of Business, Cohort C4, *AI and its Applications*. Problem statement: **Industry Event Scout**.
+Final examination project, MESA School of Business, Cohort C4, *AI and its Applications*. Problem statement: **Industry Event Scout**.
 
-Vikram, an independent management consultant, wins 40% of new business at in-person events but loses ~45 minutes every Monday searching fragmented listings — and still misses deadlines. Event Scout pulls live events from several sources, ranks them for him with Gemini Flash, flags registration deadlines under 7 days, and emails a scannable briefing every Monday at 06:30 IST — before his week starts.
+Vikram, an independent management consultant, wins 40% of new business at in person events but loses ~45 minutes every Monday searching fragmented listings, and still misses deadlines. Event Scout pulls live events from several sources, ranks them for him with Gemini Flash, flags registration deadlines under 7 days, and emails a scannable briefing every Monday at 06:30 IST, before his week starts.
 
 - **Components Map (PDF, for submission):** [docs/Event-Scout-Components-Map.pdf](docs/Event-Scout-Components-Map.pdf) · detailed version: [docs/COMPONENTS_MAP.md](docs/COMPONENTS_MAP.md)
-- **Live app:** https://event-scout-five.vercel.app (open access for review; no sign-in needed)
+- **Live app:** https://event-scout-five.vercel.app (open access for review; no sign in needed)
 - **Repository:** https://github.com/vyombhatnagar-lgtm/event-scout
 
 ## What it does
 
 | | |
 |---|---|
-| **Today** | A calm morning view: plain-English brief, two-week day strip, and one-at-a-time decision cards (Not for me · Save · Register) with real cover photos, fit score and a countdown ring. Keyboard: ← → ↓ |
-| Live discovery | Luma, Eventbrite, Meetup, AllEvents, NASSCOM, iSPIRT ProductNation and Gemini web search, for your cities, next 30 days; validated, de-duplicated, every source link kept |
+| **Today** | A calm morning view: plain English brief, two week day strip, and one at a time decision cards (Not for me · Save · Register) with real cover photos, fit score and a countdown ring. Keyboard: ← → ↓ |
+| Live discovery | Luma, Eventbrite, Meetup, AllEvents, NASSCOM, iSPIRT ProductNation and Gemini web search, for your cities, next 30 days; validated, deduplicated, every source link kept |
 | Your own sources | Add any conference site, newsletter RSS or iCal feed in Settings; or **add an event from a link / pasted LinkedIn post** |
-| AI (Gemini Flash only) | Classification, summaries, explicit-deadline extraction, event extraction from pages/posts and relevance scoring — every AI claim checked against the source text |
-| Deadlines | Real ticket-sales-end dates from Eventbrite and Luma, or stated in the text — never inferred from the event date; under 7 days flagged everywhere |
-| Calendar | One click to Google Calendar, or an .ics (Outlook/Apple) with a "registration closes" reminder — no sign-in |
-| My events | Colour-coded lanes: Going · To register · Saved · After the event; weekly action checklist with a **From last week** tab for anything still pending |
-| Monday briefing | Executive-memo email via Resend every Monday 06:30 IST (08:00 retry), sent once per week (idempotent) |
-| Preferences | Categories, cities, topics, formats, minimum fit, recipient, Calendly link — stored in the database |
+| AI (Gemini Flash only) | Classification, summaries, explicit deadline extraction, event extraction from pages/posts and relevance scoring, every AI claim checked against the source text |
+| Deadlines | Real ticket sales end dates from Eventbrite and Luma, or stated in the text, never inferred from the event date; under 7 days flagged everywhere |
+| Calendar | One click to Google Calendar, or an .ics (Outlook/Apple) with a "registration closes" reminder, no sign in |
+| My events | Colour coded lanes: Going · To register · Saved · After the event; weekly action checklist with a **From last week** tab for anything still pending |
+| Monday briefing | Executive memo email via Resend every Monday 06:30 IST (08:00 retry), sent once per week (idempotent) |
+| Preferences | Categories, cities, topics, formats, minimum fit, recipient, Calendly link, stored in the database |
 | Status | Source health, job history, configuration check |
 
 ## Stack
@@ -53,7 +53,7 @@ npm run db:migrate
 npm run dev
 ```
 
-4. Sign in, then **Run discovery now** on the dashboard. The first run fetches live events and scores them (1–3 minutes).
+4. Sign in, then **Run discovery now** on the dashboard. The first run fetches live events and scores them (1 to 3 minutes).
 
 ## Tests
 
@@ -65,12 +65,12 @@ npm test
 npm run test:live
 ```
 
-`npm test` covers deadline boundaries (exactly 7 days, 7 days − 1 s, tomorrow, passed, unknown, conflicting sources), IST time handling, normalisation, de-duplication, ranking rules, preference effects, and the AI evidence guard. `npm run test:live` hits the real sources.
+`npm test` covers deadline boundaries (exactly 7 days, 7 days − 1 s, tomorrow, passed, unknown, conflicting sources), IST time handling, normalisation, deduplication, ranking rules, preference effects, and the AI evidence guard. `npm run test:live` hits the real sources.
 
 ## Deploy to Vercel
 
 1. Import the GitHub repo in Vercel.
-2. Storage → Create Database → Neon (prefix `DATABASE`) — this sets `DATABASE_URL` automatically.
+2. Storage → Create Database → Neon (prefix `DATABASE`), this sets `DATABASE_URL` automatically.
 3. Add `GEMINI_API_KEY`, `RESEND_API_KEY`, `DIGEST_RECIPIENT_EMAIL`, `CRON_SECRET` (optional: `APP_PASSWORD`, `SESSION_SECRET`, `CALENDLY_URL`, `GEMINI_MODEL`) in Settings → Environment Variables.
 4. Deploy. Migrations run before the build. `vercel.json` registers the crons: discovery daily 05:00 IST, digest Mondays 06:30 IST (+08:00 retry). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
 
@@ -82,7 +82,7 @@ The production deployment is set up exactly this way.
 src/
   app/(app)/        dashboard, events, events/[id], pipeline, checklist, digest, settings, status
   app/api/          cron/discover, cron/digest, jobs, preferences, events/[id]/status, checklist/[id], digest/preview, auth/login
-  app/login/        sign-in
+  app/login/        sign in
   proxy.ts          password protection for every page and API route
   components/       dashboard UI, event cards, checklist, settings form, shared UI
   lib/discovery/    connectors (luma, eventbrite, meetup), normalise, deduplicate, pipeline
@@ -93,10 +93,10 @@ src/
   lib/services/     users/preferences, events queries, checklist, jobs, workflows
   lib/deadlines.ts  urgency policy;  lib/time.ts  IST time policy
 db/migrations/      SQL migrations (Drizzle)
-tests/              unit tests; tests/live for live-source acceptance tests
+tests/              unit tests; tests/live for live source acceptance tests
 docs/               Components Map
 ```
 
 ## Known limitations
 
-See [Components Map §8](docs/COMPONENTS_MAP.md#8-known-limitations). In short: three sources (not universal coverage); most listings publish no registration deadline; Luma's endpoint is undocumented and listing-page data can change; Google Calendar is planned (Phase 7).
+See [Components Map §8](docs/COMPONENTS_MAP.md#8-known-limitations). In short: three sources (not universal coverage); most listings publish no registration deadline; Luma's endpoint is undocumented and listing page data can change; Google Calendar is planned (Phase 7).

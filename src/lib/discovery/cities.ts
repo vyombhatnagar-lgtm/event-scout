@@ -1,5 +1,5 @@
 /**
- * Maps a user-facing city name to the identifiers each source uses for it.
+ * Maps a user facing city name to the identifiers each source uses for it.
  * Cities not listed here still work: identifiers are derived from the name, and a
  * connector that cannot resolve a city reports that in its run errors.
  */

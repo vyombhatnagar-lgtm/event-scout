@@ -30,7 +30,7 @@ export function discoveryJob(trigger: "cron" | "manual") {
   });
 }
 
-/** Re-score only (used after preferences change, and before the digest). */
+/** Rescore only (used after preferences change, and before the digest). */
 export function rescoreJob(trigger: "manual" | "preferences" | "cron") {
   return trackJob("scoring", trigger, async () => {
     const user = await getUser();

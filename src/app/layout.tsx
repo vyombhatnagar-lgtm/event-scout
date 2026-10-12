@@ -7,7 +7,7 @@ const display = Instrument_Serif({ variable: "--font-display", subsets: ["latin"
 
 export const metadata: Metadata = {
   title: { default: "Event Scout", template: "%s · Event Scout" },
-  description: "Your week of rooms worth entering — live events ranked for you, with deadlines you won't miss.",
+  description: "Your week of rooms worth entering, live events ranked for you, with deadlines you won't miss.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

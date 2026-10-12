@@ -7,7 +7,7 @@ import { getUser } from "@/lib/services/user";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Downloadable .ics for one event (+ a separate registration-deadline reminder when known). */
+/** Downloadable .ics for one event (+ a separate registration deadline reminder when known). */
 export async function GET(_req: Request, ctx: RouteContext<"/api/events/[id]/ics">) {
   await connection();
   const { id } = await ctx.params;

@@ -12,7 +12,7 @@ import { type Connector, QUOTA_NOTE, errMsg, fetchText } from "./types";
 const MAX_SOURCES_PER_RUN = 8;
 
 /**
- * User-configured sources (Preferences → Sources): conference sites, iSPIRT pages, newsletter
+ * User configured sources (Preferences → Sources): conference sites, iSPIRT pages, newsletter
  * RSS/Atom feeds, iCal feeds. Structured data (iCal, schema.org) is parsed directly; free text
  * goes through Gemini Flash only when the content changed since the last run, to save quota.
  */

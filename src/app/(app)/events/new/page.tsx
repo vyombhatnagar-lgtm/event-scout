@@ -9,7 +9,7 @@ export default function NewEventPage() {
     <>
       <PageHeader
         title="Add an event from a link"
-        sub="For rooms announced only on LinkedIn, by email or in a newsletter — paste it here and it joins your pipeline with its deadline tracked."
+        sub="For rooms announced only on LinkedIn, by email or in a newsletter, paste it here and it joins your pipeline with its deadline tracked."
       />
       <CaptureForm />
     </>

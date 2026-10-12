@@ -1,5 +1,5 @@
 /**
- * Single-owner access control. The app is Vikram's private workspace: when APP_PASSWORD
+ * Single owner access control. The app is Vikram's private workspace: when APP_PASSWORD
  * is set, every page and API route requires a session cookie obtained by entering it.
  * The cookie value is an HMAC of a fixed label under SESSION_SECRET, so it cannot be
  * forged without the secret and changes whenever the secret is rotated.
@@ -27,7 +27,7 @@ export async function sessionToken(): Promise<string> {
   return hmac(secret(), `event-scout-session:v1:${process.env.APP_PASSWORD ?? ""}`);
 }
 
-/** Constant-time string comparison. */
+/** Constant time string comparison. */
 export function safeEqual(a: string, b: string): boolean {
   const ab = enc.encode(a);
   const bb = enc.encode(b);

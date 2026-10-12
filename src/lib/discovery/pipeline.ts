@@ -31,7 +31,7 @@ export interface DiscoveryReport {
   updated: number;
 }
 
-/** Fetch every connector, validate, de-duplicate and persist. A failing source never blocks the others. */
+/** Fetch every connector, validate, deduplicate and persist. A failing source never blocks the others. */
 export async function runDiscovery(
   prefs: { cities: string[]; categories: string[]; topics: string[] },
   now = new Date(),
@@ -62,7 +62,7 @@ export async function runDiscovery(
             rejected.push(n.reason);
             continue;
           }
-          if (n.event.startAt < from || n.event.startAt > to) continue; // outside the 30-day window
+          if (n.event.startAt < from || n.event.startAt > to) continue; // outside the 30 day window
           accepted.push(n.event);
           ok++;
         }
@@ -154,9 +154,9 @@ async function persist(groups: MergedCandidate[]) {
     let eventId: string;
     if (matchId) {
       const prev = byId.get(matchId);
-      // Keep the longest description we have seen; only a genuinely new, longer text triggers AI re-processing.
+      // Keep the longest description we have seen; only a genuinely new, longer text triggers AI reprocessing.
       const longer = (description?.length ?? 0) > (prev?.description?.length ?? 0);
-      // Never replace an exact time (from a detail page) with a date-only listing value.
+      // Never replace an exact time (from a detail page) with a date only listing value.
       const keepTimes = prev && !prev.allDay && base.allDay;
       const { startAt, endAt, allDay, ...rest } = base;
       await d
@@ -204,7 +204,7 @@ async function persist(groups: MergedCandidate[]) {
   return { inserted, updated, ids };
 }
 
-/** Source-stated deadlines win over AI-extracted ones; conflicts keep the earliest and are flagged. */
+/** Source stated deadlines win over AI extracted ones; conflicts keep the earliest and are flagged. */
 export async function refreshEventDeadline(eventId: string) {
   const d = db();
   {
@@ -228,7 +228,7 @@ export async function refreshEventDeadline(eventId: string) {
   }
 }
 
-/** Validate, de-duplicate and store events from a single ad-hoc source (e.g. an event pasted by the user). */
+/** Validate, deduplicate and store events from a single ad hoc source (e.g. an event pasted by the user). */
 export async function persistCandidates(raw: CandidateEventInput[]) {
   const accepted: CandidateEvent[] = [];
   const rejected: string[] = [];

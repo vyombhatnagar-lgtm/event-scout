@@ -9,7 +9,7 @@ export interface SendResult {
 
 /**
  * Send one email through Resend. `idempotencyKey` makes a retried request with the
- * same key a no-op on Resend's side, so a timeout followed by a retry cannot double-send.
+ * same key a no-op on Resend's side, so a timeout followed by a retry cannot double send.
  */
 export async function sendEmail(opts: { to: string; subject: string; html: string; text: string; idempotencyKey: string }): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY;
